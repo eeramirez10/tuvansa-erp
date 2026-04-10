@@ -27,6 +27,7 @@ const modules: Module[] = [
     id: "compras",
     label: "COMPRAS",
     icon: Calculator,
+    path: "/recepciones",
     x: 72,
     y: 130,
     toneClass: "bg-gradient-to-b from-[#f4c90f] to-[#b99600]",

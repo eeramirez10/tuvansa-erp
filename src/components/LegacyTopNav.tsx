@@ -40,12 +40,14 @@ function NavButton({ label, color, textColor = "text-white", path }: NavButtonPr
 function LegacyTopNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const moduleTitle = pathname.startsWith("/inventarios")
-    ? "Inventarios"
-    : pathname.startsWith("/ventas") || pathname.startsWith("/sales")
-      ? "Facturación"
-      : "Módulo";
-  const ModuleIcon = pathname.startsWith("/inventarios") ? Package : Printer;
+  const moduleTitle = pathname.startsWith("/recepciones")
+    ? "Recepciones"
+    : pathname.startsWith("/inventarios")
+      ? "Inventarios"
+      : pathname.startsWith("/ventas") || pathname.startsWith("/sales")
+        ? "Facturación"
+        : "Módulo";
+  const ModuleIcon = pathname.startsWith("/inventarios") || pathname.startsWith("/recepciones") ? Package : Printer;
 
   return (
     <div className="overflow-x-auto p-1 pb-0 text-[11px] text-[#23303d] [font-family:Tahoma,'Segoe_UI',sans-serif]">
@@ -56,7 +58,7 @@ function LegacyTopNav() {
 
         <div className="flex  items-center justify-center gap-3 px-3 py-3">
           <div className="mt-4 flex w-30 flex-col gap-4">
-            <NavButton  label="Recep. | Ordenes" color="bg-[#E8C000]"   path="/"  />
+            <NavButton  label="Recep. | Ordenes" color="bg-[#E8C000]"   path="/recepciones"  />
           </div>
 
           <div className="mt-[10px] flex w-[120px]  flex-col gap-4">

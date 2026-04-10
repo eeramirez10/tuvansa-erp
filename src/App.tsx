@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import LegacyAppLayout from "./layouts/LegacyAppLayout";
 import HomePage from "./pages/HomePage";
 import InventoriesPage from "./pages/InventoriesPage";
+import ReceiptsPage from "./pages/ReceiptsPage";
 import SalesPage from "./pages/SalesPage";
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
 
       <Route path="/inventarios-pt" element={<InventoriesPage />} />
       <Route element={<LegacyAppLayout />}>
+        <Route path="/recepciones" element={<ReceiptsPage />} />
         <Route path="/ventas" element={<SalesPage />} />
         <Route path="/sales" element={<Navigate to="/ventas" replace />} />
         <Route path="/inventarios" element={<InventoriesPage />} />

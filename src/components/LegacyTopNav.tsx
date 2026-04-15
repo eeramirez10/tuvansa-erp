@@ -40,14 +40,35 @@ function NavButton({ label, color, textColor = "text-white", path }: NavButtonPr
 function LegacyTopNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const moduleTitle = pathname.startsWith("/recepciones")
-    ? "Recepciones"
-    : pathname.startsWith("/inventarios")
-      ? "Inventarios"
-      : pathname.startsWith("/ventas") || pathname.startsWith("/sales")
-        ? "Facturación"
-        : "Módulo";
-  const ModuleIcon = pathname.startsWith("/inventarios") || pathname.startsWith("/recepciones") ? Package : Printer;
+  const moduleTitle = pathname.startsWith("/clientes")
+    ? "Clientes"
+    : pathname.startsWith("/contabilidad")
+      ? "Contabilidad"
+    : pathname.startsWith("/bancos")
+      ? "Bancos"
+    : pathname.startsWith("/pedidos")
+      ? "Pedidos"
+    : pathname.startsWith("/ordenes-compra")
+      ? "Ordenes de compra"
+    : pathname.startsWith("/proveedores")
+      ? "Cuentas x Pagar"
+      : pathname.startsWith("/recepciones")
+        ? "Recepciones"
+        : pathname.startsWith("/inventarios")
+          ? "Inventarios"
+          : pathname.startsWith("/ventas") || pathname.startsWith("/sales")
+            ? "Facturación"
+            : "Módulo";
+  const ModuleIcon =
+    pathname.startsWith("/inventarios") ||
+    pathname.startsWith("/recepciones") ||
+    pathname.startsWith("/proveedores") ||
+    pathname.startsWith("/ordenes-compra") ||
+    pathname.startsWith("/pedidos") ||
+    pathname.startsWith("/contabilidad") ||
+    pathname.startsWith("/bancos")
+      ? Package
+      : Printer;
 
   return (
     <div className="overflow-x-auto p-1 pb-0 text-[11px] text-[#23303d] [font-family:Tahoma,'Segoe_UI',sans-serif]">
@@ -63,18 +84,18 @@ function LegacyTopNav() {
 
           <div className="mt-[10px] flex w-[120px]  flex-col gap-4">
             <NavButton label="Inventarios M.P." color="bg-[#5A9A20]" />
-            <NavButton label="Cuentas x Pagar" color="bg-[#A06020]" />
+            <NavButton label="Cuentas x Pagar" color="bg-[#A06020]" path="/proveedores" />
           </div>
 
           <div className="mt-0 flex w-[120px] flex-col gap-4">
             <NavButton label="Produccion" color="bg-[#6B8E23]" />
-            <NavButton label="Contabilidad" color="bg-[#2E8B57]" />
-            <NavButton label="Bancos" color="bg-[#7040A0]" />
+            <NavButton label="Contabilidad" color="bg-[#2E8B57]" path="/contabilidad" />
+            <NavButton label="Bancos" color="bg-[#7040A0]" path="/bancos" />
           </div>
 
           <div className="mt-[10px] flex w-[120px] flex-col gap-4">
             <NavButton label="Inventarios P.T." color="bg-[#20A090]" path="/inventarios"/>
-            <NavButton label="Cuentas x Cobrar" color="bg-[#C03080]" />
+            <NavButton label="Cuentas x Cobrar" color="bg-[#C03080]" path="/clientes" />
           </div>
 
           <div className="mt-4 flex w-30 flex-col gap-4">

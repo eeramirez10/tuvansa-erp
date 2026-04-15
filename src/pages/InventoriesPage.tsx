@@ -97,7 +97,7 @@ function InventoriesPage() {
   return (
     <main className="min-h-screen bg-[#979797] p-[4px] text-[11px] text-[#23303d] [font-family:Tahoma,'Segoe_UI',sans-serif]">
       <div className="overflow-x-auto">
-        <section className="min-h-[740px] w-[calc(100vw-10px)] min-w-[1050px] border border-[#2f8ce8] bg-[#f2f2f2] shadow-[inset_0_0_0_1px_#c6dcf6]">
+        <section className="min-h-[700px] w-[calc(100vw-16px)] min-w-[1180px] border border-[#2f8ce8] bg-[#f2f2f2] shadow-[inset_0_0_0_1px_#c6dcf6]">
           <div className="grid grid-cols-[1fr_216px] gap-[6px] p-[4px]">
             <section className="border border-[#b4bcc5] bg-white">
               <BlueTitle>Catálogo de productos</BlueTitle>

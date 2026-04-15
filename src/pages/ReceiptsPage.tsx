@@ -94,7 +94,7 @@ function ReceiptsPage() {
   return (
     <main className="p-1 text-[11px] text-[#23303d] [font-family:Tahoma,'Segoe_UI',sans-serif]">
       <div className="overflow-x-auto">
-        <section className="min-h-[760px] w-[calc(100vw-16px)] min-w-[1440px] border border-[#2f8ce8] border-t-0 bg-[#f4f4f4] shadow-[inset_0_0_0_1px_#c6dcf6]">
+        <section className="min-h-[700px] w-[calc(100vw-16px)] min-w-[1180px] border border-[#2f8ce8] border-t-0 bg-[#f4f4f4] shadow-[inset_0_0_0_1px_#c6dcf6]">
           <div className="p-[8px]">
             <div className="border border-[#b7bfc8] bg-white">
               <div className="flex h-[34px] items-center justify-between px-[8px] text-[15px] font-semibold text-black">

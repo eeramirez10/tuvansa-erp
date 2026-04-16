@@ -1,15 +1,18 @@
+import { useCallback } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  ArrowUp,
   CircleHelp,
   FilePenLine,
   Files,
   Package,
   Printer,
+  Search,
   TableProperties,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { MODAL_IDS, useModalStore } from "../modules/ui/store/modal.store";
+import { useInventoryRecordNavigation } from "../modules/inventories/hooks/useInventoryRecordNavigation";
 
 type NavButtonProps = {
   label: string;
@@ -40,6 +43,13 @@ function NavButton({ label, color, textColor = "text-white", path }: NavButtonPr
 function LegacyTopNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { isEnabled: isInventoryNavigationEnabled, isLoading: isInventoryNavigationLoading, goToPrevious, goToNext } =
+    useInventoryRecordNavigation();
+  const openModal = useModalStore((state) => state.openModal);
+  const handleOpenSearchModal = useCallback(() => {
+    openModal(MODAL_IDS.INVENTORY_SEARCH);
+  }, [openModal]);
+
   const moduleTitle = pathname.startsWith("/clientes")
     ? "Clientes"
     : pathname.startsWith("/contabilidad")
@@ -112,13 +122,27 @@ function LegacyTopNav() {
             <button className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white">
               <CircleHelp className="h-5 w-5" />
             </button>
-            <button className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white">
+            <button
+              onClick={goToPrevious}
+              disabled={!isInventoryNavigationEnabled || isInventoryNavigationLoading}
+              className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white disabled:cursor-not-allowed disabled:opacity-50"
+              title="Producto anterior"
+            >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <button className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white">
-              <ArrowUp className="h-5 w-5" />
+            <button
+              onClick={handleOpenSearchModal}
+              className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white"
+              title="Buscar producto"
+            >
+              <Search className="h-5 w-5" />
             </button>
-            <button className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white">
+            <button
+              onClick={goToNext}
+              disabled={!isInventoryNavigationEnabled || isInventoryNavigationLoading}
+              className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white disabled:cursor-not-allowed disabled:opacity-50"
+              title="Producto siguiente"
+            >
               <ArrowRight className="h-5 w-5" />
             </button>
             <button className="grid h-10 w-10 place-items-center border border-[#4a5963] bg-gradient-to-b from-[#87a8b8] to-[#5f7783] text-white">
@@ -140,6 +164,7 @@ function LegacyTopNav() {
           </div>
         </div>
       </header>
+
     </div>
   );
 }

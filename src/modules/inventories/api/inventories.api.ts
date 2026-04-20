@@ -22,8 +22,13 @@ type ApiError = {
   };
 };
 
-const fetchJson = async <T>(url: string): Promise<T> => {
+type RequestOptions = {
+  signal?: AbortSignal;
+};
+
+const fetchJson = async <T>(url: string, options?: RequestOptions): Promise<T> => {
   const response = await fetch(url, {
+    signal: options?.signal,
     headers: {
       Accept: "application/json",
     },
@@ -42,6 +47,7 @@ const fetchJson = async <T>(url: string): Promise<T> => {
 
 export const getInventories = async (
   params: InventoriesQueryParams,
+  options?: RequestOptions,
 ): Promise<InventoriesListResponse> => {
   const searchParams = new URLSearchParams();
 
@@ -61,7 +67,7 @@ export const getInventories = async (
     ? `${INVENTORIES_ENDPOINT}?${searchParams.toString()}`
     : INVENTORIES_ENDPOINT;
 
-  return fetchJson<InventoriesListResponse>(url);
+  return fetchJson<InventoriesListResponse>(url, options);
 };
 
 export const getInventoryByCode = async (code: string): Promise<InventoryDetailResponse> => {

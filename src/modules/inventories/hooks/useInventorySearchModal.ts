@@ -1,4 +1,4 @@
-import { FormEvent, KeyboardEvent, useEffect, useState } from "react";
+import { FormEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useInventoriesStore } from "../store/inventories.store";
@@ -31,7 +31,8 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
   const [searchCode, setSearchCode] = useState("");
   const [searchDescription, setSearchDescription] = useState("");
   const [activeCode, setActiveCode] = useState<string | null>(null);
-  const { isOpen, close: closeModal } = useModal(MODAL_IDS.INVENTORY_SEARCH);
+  const activeSearchControllerRef = useRef<AbortController | null>(null);
+  const { isOpen, close: closeModalRaw } = useModal(MODAL_IDS.INVENTORY_SEARCH);
   const { list, isListLoading, listError, loadInventories, selectInventory } = useInventoriesStore(
     useShallow((state) => ({
       list: state.list,
@@ -42,8 +43,40 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
     })),
   );
 
+  const cancelSearchRequest = useCallback(() => {
+    activeSearchControllerRef.current?.abort();
+    activeSearchControllerRef.current = null;
+  }, []);
+
+  const runSearch = useCallback(
+    (query?: string) => {
+      cancelSearchRequest();
+      const controller = new AbortController();
+      activeSearchControllerRef.current = controller;
+
+      void loadInventories({
+        q: query,
+        limit: 10,
+        offset: 0,
+        autoSelectFallback: false,
+        signal: controller.signal,
+      });
+    },
+    [cancelSearchRequest, loadInventories],
+  );
+
+  const closeModal = useCallback(() => {
+    cancelSearchRequest();
+    closeModalRaw();
+  }, [cancelSearchRequest, closeModalRaw]);
+
+  useEffect(() => () => {
+    cancelSearchRequest();
+  }, [cancelSearchRequest]);
+
   useEffect(() => {
     if (!isOpen) {
+      cancelSearchRequest();
       return;
     }
 
@@ -54,17 +87,14 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
 
       return list[0]?.code ?? null;
     });
-  }, [isOpen, list]);
+  }, [isOpen, list, cancelSearchRequest]);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const query = `${searchCode} ${searchDescription}`.trim();
 
-    void loadInventories({
-      q: query.length > 0 ? query : undefined,
-      offset: 0,
-    });
+    runSearch(query.length > 0 ? query : undefined);
   };
 
   const handleDescriptionInputTab = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -74,10 +104,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
 
     const query = searchDescription.trim();
 
-    void loadInventories({
-      q: query.length > 0 ? query : undefined,
-      offset: 0,
-    });
+    runSearch(query.length > 0 ? query : undefined);
   };
 
   const handleCodeInputTab = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -91,10 +118,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
       return;
     }
 
-    void loadInventories({
-      q: codeQuery,
-      offset: 0,
-    });
+    runSearch(codeQuery);
   };
 
   const selectProduct = async (code: string) => {

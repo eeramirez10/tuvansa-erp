@@ -16,6 +16,7 @@ type LoadInventoriesInput = {
   limit?: number;
   offset?: number;
   autoSelectFallback?: boolean;
+  signal?: AbortSignal;
 };
 
 type InventoriesState = {
@@ -112,11 +113,12 @@ export const useInventoriesStore = create<InventoriesState>((set, get) => ({
     const limit = input?.limit ?? get().limit;
     const offset = input?.offset ?? get().offset;
     const autoSelectFallback = input?.autoSelectFallback ?? true;
+    const signal = input?.signal;
 
     set({ isListLoading: true, listError: null, query: q, limit, offset });
 
     try {
-      const response = await getInventories({ q, limit, offset });
+      const response = await getInventories({ q, limit, offset }, { signal });
       const selectedCode = get().selectedCode;
 
       set({
@@ -135,6 +137,13 @@ export const useInventoriesStore = create<InventoriesState>((set, get) => ({
         }
       }
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        set({
+          isListLoading: false,
+        });
+        return;
+      }
+
       set({
         listError: error instanceof Error ? error.message : "Error loading inventories",
         isListLoading: false,

@@ -25,6 +25,9 @@ export const useInventoriesPage = () => {
     storage: detail?.storage,
     dimensions: detail?.dimensions,
     purchases: detail?.purchases,
+    imports: detail?.imports,
+    production: detail?.production,
+    taxes: detail?.taxes,
     accounts: detail?.accounts,
     indicators: detail?.indicators
   };

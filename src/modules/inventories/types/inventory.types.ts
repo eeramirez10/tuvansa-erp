@@ -115,6 +115,42 @@ export type InventoryPurchases = {
   equivalentUnit: string;
 };
 
+export type InventoryImports = {
+  dontHandleLayers: boolean;
+  pedimento: string;
+  importDate: string | null;
+  customsOffice: string;
+  tariff: string;
+  tariffOption: string;
+  tariffPercent: number | null;
+  tariffAmount: number | null;
+};
+
+export type InventoryProduction = {
+  variableTime: boolean;
+  lot: number | null;
+  timeDays: number | null;
+  capacity: number | null;
+  assemblyAt: string | null;
+  assemblyMode: number | null;
+  secondCode: string;
+  thirdCode: string;
+  reduceMinimumsWithOrders: boolean;
+  unproductiveTimeSams: boolean;
+};
+
+export type InventoryTaxes = {
+  salesProfile: string;
+  purchasesProfile: string;
+  iepsPercent: number | null;
+  retentionIvaPercent: number | null;
+  retentionIsrPercent: number | null;
+  ivaType: "general" | "exempt" | "zero" | "unknown";
+  retentionType: "none" | "freight" | "rent" | "fee" | "unknown";
+  dontChargeIvaOnIeps: boolean;
+  donative: boolean;
+};
+
 
 export type InventoryAccounts = {
   primary: string;
@@ -136,6 +172,9 @@ export type InventoryDetail = {
   storage: InventoryStorage;
   dimensions: InventoryDimensions;
   purchases: InventoryPurchases;
+  imports: InventoryImports;
+  production: InventoryProduction;
+  taxes: InventoryTaxes;
   accounts: InventoryAccounts;
   indicators: InventoryIndicators;
 };

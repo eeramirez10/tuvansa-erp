@@ -1,7 +1,10 @@
 import { BlueTitle } from "../modules/inventories/components/ui/BlueTile";
 import { DimensionsTabContent } from "../modules/inventories/components/tabs/DimensionsTabContent";
 import { GeneralTabContent } from "../modules/inventories/components/tabs/GeneralTabContent";
+import { ImportTabContent } from "../modules/inventories/components/tabs/ImportTabContent";
+import { ProductionTabContent } from "../modules/inventories/components/tabs/ProductionTabContent";
 import { PurchasesTabContent } from "../modules/inventories/components/tabs/PurchasesTabContent";
+import { TaxesTabContent } from "../modules/inventories/components/tabs/TaxesTabContent";
 import { InventoryActionsPanel } from "../modules/inventories/components/InventoryActionsPanel";
 import { InventoryConsultasPanel } from "../modules/inventories/components/InventoryConsultasPanel";
 import { InventoryIdentityPanel } from "../modules/inventories/components/InventoryIdentityPanel";
@@ -19,6 +22,9 @@ function InventoriesPage() {
     storage,
     dimensions,
     purchases,
+    imports,
+    production,
+    taxes,
     accounts,
     indicators,
   } = useInventoriesPage()
@@ -60,6 +66,12 @@ function InventoriesPage() {
                   {activeTab === "purchases" && (
                     <PurchasesTabContent purchases={purchases} />
                   )}
+
+                  {activeTab === "imports" && <ImportTabContent imports={imports} />}
+
+                  {activeTab === "production" && <ProductionTabContent production={production} />}
+
+                  {activeTab === "taxes" && <TaxesTabContent taxes={taxes} />}
                 </section>
               </div>
             </section>
@@ -74,6 +86,4 @@ function InventoriesPage() {
 }
 
 export default InventoriesPage;
-
-
 

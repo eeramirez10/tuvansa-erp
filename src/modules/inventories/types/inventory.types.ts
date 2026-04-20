@@ -59,6 +59,63 @@ export type InventoryStorage = {
   upc: string;
 };
 
+export type InventoryDimensions = {
+  volume: number | null;
+  weight: number | null;
+  genericBox: number | null;
+  pack: number | null;
+  length: number | null;
+  height: number | null;
+  width: number | null;
+  densityKl: number | null;
+  weightKmKpz: number | null;
+  pointsPerInch: number | null;
+  ediPack: string;
+  ediQuantity: number | null;
+  picking: number | null;
+  box: number | null;
+  pallet: number | null;
+  volumeSecondary: number | null;
+  boxSecondary: number | null;
+  innerUom: string;
+  outerUom: string;
+  palletUom: string;
+  locationSecondary: string;
+  zone: string;
+};
+
+export type InventoryPurchases = {
+  lastFiveCost: number | null;
+  originCurrency: number | null;
+  originCubicMeters: number | null;
+  originBox: number | null;
+  provider: string;
+  providerPercent: number | null;
+  code: string;
+  type: number | null;
+  unit: string;
+  equivalentTo: number | null;
+  price: number | null;
+  endSeasonAt: string | null;
+  minimumPurchase: number | null;
+  seasonCurve: number | null;
+  storeWeeksFactor: number | null;
+  warehouseWeeksFactor: number | null;
+  supplierLeadTimeDays: number | null;
+  quantityInPrepack: number | null;
+  exportRedi: boolean;
+  onlyDistributesCd: boolean;
+  statusOtb: boolean;
+  inactive: boolean;
+  climates: string;
+  prepackCount: number | null;
+  ediPack: string;
+  ediQuantity: number | null;
+  originPlace: string;
+  equivalentUnit: string;
+};
+
+
 export type InventoryAccounts = {
   primary: string;
   secondary: string;
@@ -77,6 +134,8 @@ export type InventoryDetail = {
   pricing: InventoryPricing;
   accumulators: InventoryAccumulators;
   storage: InventoryStorage;
+  dimensions: InventoryDimensions;
+  purchases: InventoryPurchases;
   accounts: InventoryAccounts;
   indicators: InventoryIndicators;
 };

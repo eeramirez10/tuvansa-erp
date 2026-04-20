@@ -1,0 +1,65 @@
+export const leftActionsTop = [
+  "Almacenes",
+  "Alta CT",
+  "Bloquear",
+  "Clasificar",
+  "Descr. ext.",
+  "% Descuentos clis",
+  "% Descuentos prvs",
+  "Otros",
+  "Especificaciones",
+  "Inv. CT",
+  "SKUs",
+  "Prepacks",
+  "Canales",
+  "Precios",
+];
+
+export const leftActionsBottom = [
+  "Alternos",
+  "Componentes",
+  "Especific. Cal",
+  "Implosion",
+  "Lotes",
+  "UEPS / PEPS",
+  "Caracteristicas",
+];
+
+export const rightConsultas = [
+  "Auxiliar",
+  "Pedidos por cliente   *   CT",
+  "Cotizaciones por cliente",
+  "Ventas por cliente    *   CT",
+  "Ventas desglosadas",
+  "Ventas por sucursal",
+  "Ventas anuales",
+  "Ventas anuales resumen",
+  "Ordenado a proveedores  CT",
+  "Cotizado a proveedores  CT",
+  "Compras por proveedor  DT",
+  "Compras desglosadas",
+  "Compras anuales",
+  "Compras anuales resumen",
+  "Piezas",
+  "Piezas surtidas",
+  "WIP                   CT",
+  "Habilitaciones pendientes",
+  "Documentos",
+  "Bonificaciones",
+  "Curva Tmp.      Curva 2",
+  "Historial pos",
+];
+
+
+export const inventoryTabs = [
+  { key: "general", label: "General" },
+  { key: "dimensions", label: "Dimensiones" },
+  { key: "purchases", label: "Compras" },
+  { key: "imports", label: "Importación" },
+  { key: "production", label: "Producción" },
+  { key: "taxes", label: "Impuestos" },
+  { key: "posweb", label: "POS y Web" },
+  { key: "misc", label: "Varios" },
+  { key: "photo", label: "Foto" },
+  { key: "prices", label: "Precios" },
+] as const;

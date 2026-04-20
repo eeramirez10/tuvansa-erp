@@ -1,5 +1,6 @@
 import type {
   InventoryDetailResponse,
+  InventoryWarehousesResponse,
   InventoriesListResponse,
   InventoriesQueryParams,
 } from "../types/inventory.types";
@@ -102,5 +103,13 @@ export const getPreviousInventoryByCode = async (
 ): Promise<InventoryDetailResponse | null> => {
   return fetchOptionalJson<InventoryDetailResponse>(
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/previous`,
+  );
+};
+
+export const getInventoryWarehousesByCode = async (
+  code: string,
+): Promise<InventoryWarehousesResponse> => {
+  return fetchJson<InventoryWarehousesResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/warehouses`,
   );
 };

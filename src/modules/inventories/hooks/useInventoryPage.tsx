@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { inventoryTabs } from "../constants";
 import { useInventoriesStore } from "../store/inventories.store";
 import { useShallow } from "zustand/shallow";
@@ -9,17 +9,11 @@ export const useInventoriesPage = () => {
 
   const {
     detail,
-    initialize,
   } = useInventoriesStore(
     useShallow((state) => ({
       detail: state.detail,
-      initialize: state.initialize,
     })),
   );
-
-  useEffect(() => {
-    void initialize();
-  }, [initialize]);
 
   return {
     setActiveTab,

@@ -163,6 +163,49 @@ export type InventoryDetailResponse = {
   };
 };
 
+export type InventoryWarehouse = {
+  cd: number | null;
+  warehouse: string;
+  description: string;
+  quantity: number | null;
+  minimum: number | null;
+  maximum: number | null;
+  veol: number | null;
+  minimumStore: number | null;
+  sales6: number | null;
+  order: number | null;
+  assigned: number | null;
+  physical: number | null;
+  countInventory: number | null;
+  allStores: number | null;
+  status: string;
+  transit: number | null;
+  createdAt: string | null;
+  lastSaleAt: string | null;
+  providerOrder: number | null;
+  location: string;
+  accumulatedSales: number | null;
+  s1: number | null;
+  s2: number | null;
+  s3: number | null;
+  s4: number | null;
+  s5: number | null;
+  s6: number | null;
+  price: number | null;
+  totalReceipts: number | null;
+  curve: number | null;
+};
+
+export type InventoryWarehousesResponse = {
+  data: InventoryWarehouse[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+  };
+};
+
 export type InventoriesQueryParams = {
   q?: string;
   limit?: number;

@@ -47,11 +47,6 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
       return;
     }
 
-    if (list.length === 0) {
-      void loadInventories({ offset: 0 });
-      return;
-    }
-
     setActiveCode((current) => {
       if (current && list.some((item) => item.code === current)) {
         return current;
@@ -59,7 +54,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
 
       return list[0]?.code ?? null;
     });
-  }, [isOpen, list, loadInventories]);
+  }, [isOpen, list]);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

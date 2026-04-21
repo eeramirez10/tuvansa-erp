@@ -1,0 +1,126 @@
+import { Square, X } from "lucide-react";
+import { useInventoryAuxiliarModal } from "../hooks/useInventoryAuxiliarModal";
+import { formatFixed } from "../utils/formatFixed";
+import { formatLegacyDate } from "../utils/formatLegacyDate";
+
+const COLUMNS = [
+  { key: "fecha", label: "Fecha", width: "w-[96px]" },
+  { key: "documento", label: "Documento", width: "w-[102px]" },
+  { key: "tm", label: "TM", width: "w-[36px]" },
+  { key: "costo", label: "Costo", width: "w-[80px]" },
+  { key: "entradas", label: "Entradas", width: "w-[82px]" },
+  { key: "salidas", label: "Salidas", width: "w-[82px]" },
+  { key: "stock", label: "Stock Alm.", width: "w-[82px]" },
+  { key: "alm", label: "Alm.", width: "w-[44px]" },
+  { key: "pzas", label: "Pzas", width: "w-[74px]" },
+  { key: "ruta", label: "Ruta", width: "w-[80px]" },
+  { key: "usr", label: "Usr.", width: "w-[38px]" },
+  { key: "reval", label: "Reval", width: "w-[48px]" },
+  { key: "referencia", label: "Referencia ellos", width: "w-[130px]" },
+] as const;
+
+function InventoryAuxiliarModal() {
+  const { isOpen, close, stockPrevious, rows, currentCode, isLoading, error } = useInventoryAuxiliarModal();
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+      <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
+        <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
+          <div className="flex items-center gap-1">
+            <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
+            <h2 className="text-[12px] leading-none font-semibold text-[#1e293b]">Auxiliar</h2>
+          </div>
+          <div className="mr-auto ml-3 text-[11px] text-[#3a4552]">{currentCode ? `Producto: ${currentCode}` : ""}</div>
+          <div className="flex items-center gap-[6px]">
+            <button
+              type="button"
+              className="grid h-[18px] w-[18px] place-items-center border border-[#6d747b] bg-[#ededed] text-[#2c3948]"
+            >
+              <Square className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={close}
+              className="grid h-[18px] w-[18px] place-items-center border border-[#6d747b] bg-[#ededed] text-[#2c3948]"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </header>
+
+        <div className="border-b border-[#a3abb3] px-2 py-1">
+          <div className="mx-auto flex w-fit items-center gap-2 text-[12px] text-[#1e293b]">
+            <span>Stock anterior</span>
+            <span className="inline-flex h-[22px] w-[64px] items-center justify-end border border-[#a7adb3] bg-[#d8d9db] px-[4px]">
+              {formatFixed(stockPrevious, 2)}
+            </span>
+          </div>
+        </div>
+
+        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+          <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
+            <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
+              <tr>
+                {COLUMNS.map((column) => (
+                  <th
+                    key={column.key}
+                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={`${row.date}-${row.document}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
+                  <td className="w-[96px] border border-[#a6adb5] px-1 py-[5px]">{formatLegacyDate(row.date)}</td>
+                  <td className="w-[102px] border border-[#a6adb5] px-1 py-[5px] text-[#144d84]">{row.document}</td>
+                  <td className="w-[36px] border border-[#a6adb5] px-1 py-[5px] text-center">{row.tm}</td>
+                  <td className="w-[80px] border border-[#a6adb5] px-1 py-[5px] text-right">{formatFixed(row.cost, 2)}</td>
+                  <td className="w-[82px] border border-[#a6adb5] px-1 py-[5px] text-right">{row.entries ? formatFixed(row.entries, 3) : ""}</td>
+                  <td className="w-[82px] border border-[#a6adb5] px-1 py-[5px] text-right">{row.exits ? formatFixed(row.exits, 3) : ""}</td>
+                  <td className="w-[82px] border border-[#a6adb5] px-1 py-[5px] text-right">{formatFixed(row.stock, 3)}</td>
+                  <td className="w-[44px] border border-[#a6adb5] px-1 py-[5px]">{row.warehouse}</td>
+                  <td className="w-[74px] border border-[#a6adb5] px-1 py-[5px]">{row.pieces ? String(row.pieces) : ""}</td>
+                  <td className="w-[80px] border border-[#a6adb5] px-1 py-[5px] text-center">{row.route}</td>
+                  <td className="w-[38px] border border-[#a6adb5] px-1 py-[5px] text-right">{row.user ? String(row.user) : ""}</td>
+                  <td className="w-[48px] border border-[#a6adb5] px-1 py-[5px] text-right">{formatFixed(row.revaluation, 2)}</td>
+                  <td className="w-[130px] border border-[#a6adb5] px-1 py-[5px]">{row.reference}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {isLoading ? (
+            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
+              Cargando auxiliar...
+            </div>
+          ) : null}
+          {error ? (
+            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
+              {error}
+            </div>
+          ) : null}
+        </div>
+
+        <footer className="flex h-[42px] items-center gap-3 border-t border-[#a1a8af] bg-[#ececec] px-2">
+          <button type="button" className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px]">
+            Filtrar almacén
+          </button>
+          <button type="button" className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px]">
+            Filtrar T'S
+          </button>
+          <button type="button" className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px]">
+            TST
+          </button>
+        </footer>
+      </section>
+    </div>
+  );
+}
+
+export default InventoryAuxiliarModal;

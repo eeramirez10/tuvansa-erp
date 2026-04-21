@@ -27,7 +27,7 @@ export const leftActionsBottom = [
 
 export const rightConsultas = [
   "Auxiliar",
-  "Pedidos por cliente   *   CT",
+  "Pedidos por cliente",
   "Cotizaciones por cliente",
   "Ventas por cliente    *   CT",
   "Ventas desglosadas",

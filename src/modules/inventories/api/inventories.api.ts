@@ -1,4 +1,6 @@
 import type {
+  InventoryAuxiliarResponse,
+  InventoryClientOrdersResponse,
   InventoryDetailResponse,
   InventoryWarehousesResponse,
   InventoriesListResponse,
@@ -121,5 +123,25 @@ export const getInventoryWarehousesByCode = async (
 ): Promise<InventoryWarehousesResponse> => {
   return fetchJson<InventoryWarehousesResponse>(
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/warehouses`,
+  );
+};
+
+export const getInventoryAuxiliarByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryAuxiliarResponse> => {
+  return fetchJson<InventoryAuxiliarResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/auxiliar`,
+    options,
+  );
+};
+
+export const getInventoryClientOrdersByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryClientOrdersResponse> => {
+  return fetchJson<InventoryClientOrdersResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/orders-by-client`,
+    options,
   );
 };

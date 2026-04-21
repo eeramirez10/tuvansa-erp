@@ -296,6 +296,60 @@ export type InventoryWarehousesResponse = {
   };
 };
 
+export type InventoryAuxiliarRow = {
+  date: string | null;
+  document: string;
+  tm: string;
+  cost: number | null;
+  entries: number | null;
+  exits: number | null;
+  stock: number | null;
+  warehouse: string;
+  pieces: number | null;
+  route: string;
+  user: number | null;
+  revaluation: number | null;
+  reference: string;
+};
+
+export type InventoryAuxiliarResponse = {
+  data: InventoryAuxiliarRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    stockPrevious?: number;
+  };
+};
+
+export type InventoryClientOrderRow = {
+  code: string;
+  description: string;
+  expectedDate: string | null;
+  expiresAt: string | null;
+  number: string;
+  ordered: number | null;
+  supplied: number | null;
+  remaining: number | null;
+  assigned: number | null;
+  price: number | null;
+  externalNumber: string;
+  pieces: number | null;
+  warehouse: string;
+  wms: number | null;
+};
+
+export type InventoryClientOrdersResponse = {
+  data: InventoryClientOrderRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+  };
+};
+
 export type InventoriesQueryParams = {
   q?: string;
   searchBy?: "auto" | "code" | "description";

@@ -1,7 +1,43 @@
-import { rightConsultas } from "../constants"
+import { rightConsultas } from "../constants";
+import { useModal } from "../../ui/hooks/useModal";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
+type TripleConsultaButtonProps = {
+  label: string;
+  onMainClick?: () => void;
+  onStarClick?: () => void;
+  onCtClick?: () => void;
+};
+
+function TripleConsultaButton({ label, onMainClick, onStarClick, onCtClick }: TripleConsultaButtonProps) {
+  return (
+    <div className="flex h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] text-[11px] font-semibold text-[#3f464f]">
+      <button
+        type="button"
+        onClick={onMainClick}
+        className="h-full flex-1 border-r border-[#a0a6ad] px-2 text-center leading-[22px]"
+      >
+        {label}
+      </button>
+      <button
+        type="button"
+        onClick={onStarClick}
+        className="h-full w-[24px] border-r border-[#a0a6ad] text-center leading-[22px]"
+      >
+        *
+      </button>
+      <button type="button" onClick={onCtClick} className="h-full w-[34px] text-center leading-[22px]">
+        CT
+      </button>
+    </div>
+  );
+}
 
 export const InventoryConsultasPanel = () => {
+  const { open: openAuxiliarModal } = useModal(MODAL_IDS.INVENTORY_AUXILIAR);
+  const { open: openPedidosClienteModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CLIENTE);
+  const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
+  const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
 
   return (
     <aside className="border border-[#9ca4ac] bg-[#d7d7d7]">
@@ -10,16 +46,31 @@ export const InventoryConsultasPanel = () => {
         <span className="text-[15px] leading-none">×</span>
       </div>
       <div className="grid gap-[2px] p-[4px]">
-        {rightConsultas.map((item, idx) => (
-          <button
-            key={`${item}-${idx}`}
-            type="button"
-            className="h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] px-2 text-center text-[11px] leading-[22px] font-semibold text-[#3f464f]"
-          >
-            {item}
-          </button>
-        ))}
+        {rightConsultas.map((item, idx) => {
+          if (item === "Pedidos por cliente") {
+            return (
+              <TripleConsultaButton
+                key={`${item}-${idx}`}
+                label={item}
+                onMainClick={openPedidosClienteModal}
+                onStarClick={openPedidosAsteriscoModal}
+                onCtClick={openPedidosCtModal}
+              />
+            );
+          }
+
+          return (
+            <button
+              key={`${item}-${idx}`}
+              type="button"
+              onClick={item === "Auxiliar" ? openAuxiliarModal : undefined}
+              className="h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] px-2 text-center text-[11px] leading-[22px] font-semibold text-[#3f464f]"
+            >
+              {item}
+            </button>
+          );
+        })}
       </div>
     </aside>
-  )
-}
+  );
+};

@@ -6,6 +6,7 @@ import { LeftButton } from "./ui/LeftButton";
 
 export const  InventoryActionsPanel = () => {
   const { open: openWarehousesModal } = useModal(MODAL_IDS.INVENTORY_WAREHOUSES);
+  const { open: openOthersModal } = useModal(MODAL_IDS.INVENTORY_OTHERS);
 
   return (
     <aside className="border-r border-[#c8ccd1] bg-[#ececec] p-[3px]">
@@ -14,7 +15,13 @@ export const  InventoryActionsPanel = () => {
       </div>
       <div className="grid gap-[2px]">
         {leftActionsTop.map((item) => (
-          <LeftButton key={item} label={item} onClick={item === "Almacenes" ? openWarehousesModal : undefined} />
+          <LeftButton
+            key={item}
+            label={item}
+            onClick={
+              item === "Almacenes" ? openWarehousesModal : item === "Otros" ? openOthersModal : undefined
+            }
+          />
         ))}
       </div>
 

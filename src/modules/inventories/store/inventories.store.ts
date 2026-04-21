@@ -13,6 +13,7 @@ const DEFAULT_INVENTORY_CODE = "004212899";
 
 type LoadInventoriesInput = {
   q?: string;
+  searchBy?: "auto" | "code" | "description";
   limit?: number;
   offset?: number;
   autoSelectFallback?: boolean;
@@ -110,6 +111,7 @@ export const useInventoriesStore = create<InventoriesState>((set, get) => ({
 
   loadInventories: async (input) => {
     const q = input?.q ?? get().query;
+    const searchBy = input?.searchBy ?? "auto";
     const limit = input?.limit ?? get().limit;
     const offset = input?.offset ?? get().offset;
     const autoSelectFallback = input?.autoSelectFallback ?? true;
@@ -118,7 +120,7 @@ export const useInventoriesStore = create<InventoriesState>((set, get) => ({
     set({ isListLoading: true, listError: null, query: q, limit, offset });
 
     try {
-      const response = await getInventories({ q, limit, offset }, { signal });
+      const response = await getInventories({ q, searchBy, limit, offset }, { signal });
       const selectedCode = get().selectedCode;
 
       set({

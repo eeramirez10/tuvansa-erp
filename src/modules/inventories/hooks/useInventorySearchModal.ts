@@ -32,6 +32,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
   const [searchDescription, setSearchDescription] = useState("");
   const [activeCode, setActiveCode] = useState<string | null>(null);
   const activeSearchControllerRef = useRef<AbortController | null>(null);
+  const lastSearchKeyRef = useRef<string>("");
   const { isOpen, close: closeModalRaw } = useModal(MODAL_IDS.INVENTORY_SEARCH);
   const { list, isListLoading, listError, loadInventories, selectInventory } = useInventoriesStore(
     useShallow((state) => ({
@@ -49,24 +50,34 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
   }, []);
 
   const runSearch = useCallback(
-    (query?: string) => {
+    (query?: string, searchBy: "auto" | "code" | "description" = "auto") => {
+      const normalizedQuery = query?.trim() ?? "";
+      const searchKey = `${searchBy}:${normalizedQuery}`;
+
+      if (lastSearchKeyRef.current === searchKey && isListLoading) {
+        return;
+      }
+
       cancelSearchRequest();
       const controller = new AbortController();
       activeSearchControllerRef.current = controller;
+      lastSearchKeyRef.current = searchKey;
 
       void loadInventories({
-        q: query,
+        q: normalizedQuery || undefined,
+        searchBy,
         limit: 10,
         offset: 0,
         autoSelectFallback: false,
         signal: controller.signal,
       });
     },
-    [cancelSearchRequest, loadInventories],
+    [cancelSearchRequest, isListLoading, loadInventories],
   );
 
   const closeModal = useCallback(() => {
     cancelSearchRequest();
+    lastSearchKeyRef.current = "";
     closeModalRaw();
   }, [cancelSearchRequest, closeModalRaw]);
 
@@ -94,7 +105,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
 
     const query = `${searchCode} ${searchDescription}`.trim();
 
-    runSearch(query.length > 0 ? query : undefined);
+    runSearch(query.length > 0 ? query : undefined, "auto");
   };
 
   const handleDescriptionInputTab = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -104,7 +115,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
 
     const query = searchDescription.trim();
 
-    runSearch(query.length > 0 ? query : undefined);
+    runSearch(query.length > 0 ? query : undefined, "description");
   };
 
   const handleCodeInputTab = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -118,7 +129,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
       return;
     }
 
-    runSearch(codeQuery);
+    runSearch(codeQuery, "code");
   };
 
   const selectProduct = async (code: string) => {

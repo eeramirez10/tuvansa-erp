@@ -3,6 +3,7 @@ import { create } from "zustand";
 export const MODAL_IDS = {
   INVENTORY_SEARCH: "inventorySearch",
   INVENTORY_WAREHOUSES: "inventoryWarehouses",
+  INVENTORY_OTHERS: "inventoryOthers",
 } as const;
 
 export type ModalId = (typeof MODAL_IDS)[keyof typeof MODAL_IDS];

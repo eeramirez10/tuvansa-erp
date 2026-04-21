@@ -98,8 +98,8 @@ function InventoryWarehousesModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-2">
-      <section className="flex h-[min(650px,92vh)] w-[min(1810px,99vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+      <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
             <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
@@ -115,7 +115,7 @@ function InventoryWarehousesModal() {
           </button>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>

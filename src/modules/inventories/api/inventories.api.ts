@@ -55,6 +55,10 @@ export const getInventories = async (
     searchParams.set("q", params.q.trim());
   }
 
+  if (params.searchBy) {
+    searchParams.set("searchBy", params.searchBy);
+  }
+
   if (typeof params.limit === "number") {
     searchParams.set("limit", String(params.limit));
   }

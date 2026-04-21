@@ -151,6 +151,56 @@ export type InventoryTaxes = {
   donative: boolean;
 };
 
+export type InventoryOthers = {
+  options: {
+    composition: string;
+    virtualStore: boolean;
+    inactiveForPurchases: boolean;
+    controlByPieces: boolean;
+    fractionable: boolean;
+    lastChangedBy: number | null;
+    warehouse: number | null;
+    nextReceptionAt: string | null;
+    transit: number | null;
+    physicalInitial: number | null;
+    lastChangedAt: string | null;
+    list123ChangedAt: string | null;
+    unsupplied: number | null;
+    firstPosSaleAt: string | null;
+    countInventory: number | null;
+    row: string;
+    rootCode: string;
+    color: string;
+  };
+  prices: {
+    commissionPercent: number | null;
+    iepsPercent: number | null;
+    fixedIepsPercent: number | null;
+    offerFrom: string | null;
+    offerTo: string | null;
+    minUntil: string | null;
+    walletPercent: number | null;
+    lists: Array<{
+      list: number;
+      price: number | null;
+      currency: number | null;
+      percent: number | null;
+    }>;
+  };
+  exportData: {
+    tariff: string;
+    factor: number | null;
+  };
+  ccp: {
+    materialDangerousType: number | null;
+    hazardousKey: string;
+    packagingKey: string;
+  };
+  vars: {
+    values: Array<number | null>;
+  };
+};
+
 
 export type InventoryAccounts = {
   primary: string;
@@ -175,6 +225,7 @@ export type InventoryDetail = {
   imports: InventoryImports;
   production: InventoryProduction;
   taxes: InventoryTaxes;
+  others: InventoryOthers;
   accounts: InventoryAccounts;
   indicators: InventoryIndicators;
 };
@@ -247,6 +298,7 @@ export type InventoryWarehousesResponse = {
 
 export type InventoriesQueryParams = {
   q?: string;
+  searchBy?: "auto" | "code" | "description";
   limit?: number;
   offset?: number;
 };

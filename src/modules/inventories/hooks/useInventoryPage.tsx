@@ -28,6 +28,7 @@ export const useInventoriesPage = () => {
     imports: detail?.imports,
     production: detail?.production,
     taxes: detail?.taxes,
+    others: detail?.others,
     accounts: detail?.accounts,
     indicators: detail?.indicators
   };

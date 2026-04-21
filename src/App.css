@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+#root .overflow-x-auto:not(.modal-scroll) {
+  overflow-x: hidden !important;
+}
+
+#root .overflow-y-auto:not(.modal-scroll) {
+  overflow-y: hidden !important;
+}
+
+#root .overflow-auto:not(.modal-scroll) {
+  overflow: hidden !important;
+}
+
+#root .modal-scroll {
+  overflow: auto !important;
+}

@@ -3,6 +3,8 @@ import InventoryWarehousesModal from "../../inventories/components/InventoryWare
 import InventoryOthersModal from "../../inventories/components/InventoryOthersModal";
 import InventoryAuxiliarModal from "../../inventories/components/InventoryAuxiliarModal";
 import InventoryPedidosClienteModal from "../../inventories/components/InventoryPedidosClienteModal";
+import InventoryCotizacionesClienteModal from "../../inventories/components/InventoryCotizacionesClienteModal";
+import InventoryVentasClienteModal from "../../inventories/components/InventoryVentasClienteModal";
 import InventoryPedidosAsteriscoModal from "../../inventories/components/InventoryPedidosAsteriscoModal";
 import InventoryPedidosCtModal from "../../inventories/components/InventoryPedidosCtModal";
 
@@ -14,6 +16,8 @@ function AppModalHost() {
       <InventoryOthersModal />
       <InventoryAuxiliarModal />
       <InventoryPedidosClienteModal />
+      <InventoryCotizacionesClienteModal />
+      <InventoryVentasClienteModal />
       <InventoryPedidosAsteriscoModal />
       <InventoryPedidosCtModal />
     </>

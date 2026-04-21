@@ -350,6 +350,25 @@ export type InventoryClientOrdersResponse = {
   };
 };
 
+export type InventoryClientSaleRow = {
+  code: string;
+  client: string;
+  quantity: number | null;
+  amount: number | null;
+};
+
+export type InventoryClientSalesResponse = {
+  data: InventoryClientSaleRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totalQuantity?: number;
+    totalAmount?: number;
+  };
+};
+
 export type InventoriesQueryParams = {
   q?: string;
   searchBy?: "auto" | "code" | "description";

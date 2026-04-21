@@ -36,6 +36,8 @@ function TripleConsultaButton({ label, onMainClick, onStarClick, onCtClick }: Tr
 export const InventoryConsultasPanel = () => {
   const { open: openAuxiliarModal } = useModal(MODAL_IDS.INVENTORY_AUXILIAR);
   const { open: openPedidosClienteModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CLIENTE);
+  const { open: openCotizacionesClienteModal } = useModal(MODAL_IDS.INVENTORY_COTIZACIONES_CLIENTE);
+  const { open: openVentasClienteModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_CLIENTE);
   const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
   const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
 
@@ -59,11 +61,21 @@ export const InventoryConsultasPanel = () => {
             );
           }
 
+          if (item === "Ventas por cliente") {
+            return <TripleConsultaButton key={`${item}-${idx}`} label={item} onMainClick={openVentasClienteModal} />;
+          }
+
           return (
             <button
               key={`${item}-${idx}`}
               type="button"
-              onClick={item === "Auxiliar" ? openAuxiliarModal : undefined}
+              onClick={
+                item === "Auxiliar"
+                  ? openAuxiliarModal
+                  : item === "Cotizaciones por cliente"
+                    ? openCotizacionesClienteModal
+                    : undefined
+              }
               className="h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] px-2 text-center text-[11px] leading-[22px] font-semibold text-[#3f464f]"
             >
               {item}

@@ -31,6 +31,9 @@ const useInventoryPedidoModal = (modalId: keyof typeof MODAL_IDS): PedidoModalSt
 export const useInventoryPedidosClienteModal = (): PedidoModalState =>
   useInventoryPedidoModal("INVENTORY_PEDIDOS_CLIENTE");
 
+export const useInventoryCotizacionesClienteModal = (): PedidoModalState =>
+  useInventoryPedidoModal("INVENTORY_COTIZACIONES_CLIENTE");
+
 export const useInventoryPedidosAsteriscoModal = (): PedidoModalState =>
   useInventoryPedidoModal("INVENTORY_PEDIDOS_ASTERISCO");
 
@@ -102,7 +105,7 @@ const mapClientOrderToRow = (row: InventoryClientOrderRow): ClientOrderRow => ({
 });
 
 const useInventoryClientOrdersData = (
-  modalId: "INVENTORY_PEDIDOS_CLIENTE" | "INVENTORY_PEDIDOS_CT",
+  modalId: "INVENTORY_PEDIDOS_CLIENTE" | "INVENTORY_PEDIDOS_CT" | "INVENTORY_COTIZACIONES_CLIENTE",
 ): ClientOrdersBaseData => {
   const { isOpen, close, currentCode } = useInventoryPedidoModal(modalId);
   const [rows, setRows] = useState<ClientOrderRow[]>([]);
@@ -197,6 +200,10 @@ export const useInventoryPedidosClienteData = () => {
     ...baseData,
     summary,
   };
+};
+
+export const useInventoryCotizacionesClienteData = () => {
+  return useInventoryClientOrdersData("INVENTORY_COTIZACIONES_CLIENTE");
 };
 
 export const useInventoryPedidosCtData = () => {

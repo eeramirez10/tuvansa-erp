@@ -29,7 +29,7 @@ export const rightConsultas = [
   "Auxiliar",
   "Pedidos por cliente",
   "Cotizaciones por cliente",
-  "Ventas por cliente    *   CT",
+  "Ventas por cliente",
   "Ventas desglosadas",
   "Ventas por sucursal",
   "Ventas anuales",

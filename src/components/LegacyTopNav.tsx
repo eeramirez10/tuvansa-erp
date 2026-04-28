@@ -16,27 +16,145 @@ import { useInventoryRecordNavigation } from "../modules/inventories/hooks/useIn
 
 type NavButtonProps = {
   label: string;
-  color: string;
+  gradient: string;
+  borderColor: string;
+  shadowColor: string;
   textColor?: string;
   path?: string;
+  className?: string;
 };
 
-function NavButton({ label, color, textColor = "text-white", path }: NavButtonProps) {
+function NavButton({
+  label,
+  gradient,
+  borderColor,
+  shadowColor,
+  textColor = "text-white",
+  path,
+  className = "",
+}: NavButtonProps) {
   const navigate = useNavigate();
 
   return (
-    <button
-      type="button"
-      onClick={() => path && navigate(path)}
-      className={[
-        "w-full select-none rounded-[7px] border border-[rgba(0,0,0,0.35)] border-b-[2px] px-2.5 py-1.5 text-center text-[10.5px] leading-none font-bold shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-150 [box-shadow:0_6px_0_0_rgba(0,0,0,0.24),0_10px_0_0_rgba(0,0,0,0.14)] active:translate-y-[3px] active:border-b-0 active:[box-shadow:0_0px_0_0_rgba(0,0,0,0.24),0_0px_0_0_rgba(0,0,0,0.14)]",
-        color,
-        textColor,
-        path ? "cursor-pointer hover:brightness-110" : "cursor-default",
-      ].join(" ")}
-    >
-      {label}
-    </button>
+    <div className={["relative pb-[7px]", className].join(" ")}>
+      <button
+        type="button"
+        onClick={() => path && navigate(path)}
+        className={[
+          "relative h-[22px] w-full select-none rounded-full border px-[9px] text-center text-[10px] leading-none font-bold tracking-[0.18px] uppercase",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.26),inset_0_-1px_0_rgba(0,0,0,0.2),0_1px_0_0_rgba(0,0,0,0.24)]",
+          "transition-all duration-150 active:translate-y-[1px] active:shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-1px_0_rgba(0,0,0,0.14)]",
+          "bg-gradient-to-b",
+          gradient,
+          borderColor,
+          shadowColor,
+          textColor,
+          path ? "cursor-pointer hover:brightness-[1.02]" : "cursor-default",
+        ].join(" ")}
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-[2px] left-[9%] h-[2px] w-[82%] rounded-full bg-white/14"
+        />
+        {label}
+      </button>
+      <span
+        aria-hidden
+        className={[
+          "pointer-events-none absolute top-[22px] left-0 w-full text-center text-[8px] font-bold uppercase tracking-[0.25px]",
+          "opacity-16 blur-[0.35px] [transform:scaleY(-1)] [mask-image:linear-gradient(to_bottom,rgba(255,255,255,0.55),transparent)]",
+          textColor,
+        ].join(" ")}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+type SplitNavButtonProps = {
+  leftLabel: string;
+  rightLabel: string;
+  path: string;
+  className?: string;
+  variant?: "gold" | "blue";
+};
+
+function SplitNavButton({
+  leftLabel,
+  rightLabel,
+  path,
+  className = "",
+  variant = "gold",
+}: SplitNavButtonProps) {
+  const navigate = useNavigate();
+  const isBlue = variant === "blue";
+  const containerTone = isBlue
+    ? "border-[#203271] bg-gradient-to-b from-[#4f67d0] via-[#374fae] to-[#263f98]"
+    : "border-[#9f7c06] bg-gradient-to-b from-[#f4d93c] via-[#e3c117] to-[#c89f03]";
+  const dividerTone = isBlue ? "bg-[#23346f]/90" : "bg-[#8a6f12]/85";
+  const textTone = isBlue ? "text-[#eef2ff]" : "text-[#fef9e8]";
+
+  return (
+    <div className={["relative w-[112px] pb-[7px]", className].join(" ")}>
+      <div
+        className={[
+          "relative flex h-[22px] w-full overflow-hidden rounded-full border border-[#9f7c06]",
+          containerTone,
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.25),inset_0_-1px_0_rgba(0,0,0,0.2),0_1px_0_0_rgba(0,0,0,0.22)]",
+        ].join(" ")}
+      >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-[2px] left-[8%] h-[2px] w-[84%] rounded-full bg-white/12"
+        />
+        <span
+          aria-hidden
+          className={[
+            "pointer-events-none absolute top-[2px] bottom-[2px] left-1/2 w-px -translate-x-1/2",
+            dividerTone,
+          ].join(" ")}
+        />
+        <button
+          type="button"
+          onClick={() => navigate(path)}
+          className={[
+            "h-full basis-1/2 cursor-pointer pr-[1px] text-center text-[10px] leading-none font-bold tracking-[0.18px] uppercase hover:brightness-[1.02]",
+            textTone,
+          ].join(" ")}
+        >
+          {leftLabel}
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate(path)}
+          className={[
+            "h-full basis-1/2 cursor-pointer pl-[1px] text-center text-[10px] leading-none font-bold tracking-[0.18px] uppercase hover:brightness-[1.02]",
+            textTone,
+          ].join(" ")}
+        >
+          {rightLabel}
+        </button>
+      </div>
+      <div className="pointer-events-none absolute top-[22px] left-0 flex w-full">
+        <span
+          className={[
+            "w-1/2 text-center text-[8px] font-bold uppercase tracking-[0.25px] opacity-16 blur-[0.35px] [transform:scaleY(-1)] [mask-image:linear-gradient(to_bottom,rgba(255,255,255,0.55),transparent)]",
+            textTone,
+          ].join(" ")}
+        >
+          {leftLabel}
+        </span>
+        <span
+          className={[
+            "w-1/2 text-center text-[8px] font-bold uppercase tracking-[0.25px] opacity-16 blur-[0.35px] [transform:scaleY(-1)] [mask-image:linear-gradient(to_bottom,rgba(255,255,255,0.55),transparent)]",
+            textTone,
+          ].join(" ")}
+        >
+          {rightLabel}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -87,29 +205,69 @@ function LegacyTopNav() {
           <img src="logo-tuvansa.png" className="h-15" alt="" />
         </div>
 
-        <div className="flex  items-center justify-center gap-3 px-3 py-3">
-          <div className="mt-4 flex w-30 flex-col gap-4">
-            <NavButton  label="Recep. | Ordenes" color="bg-[#E8C000]"   path="/recepciones"  />
+        <div className="flex items-center justify-center gap-[6px] px-3 py-3">
+          <div className="mt-4 flex w-30 flex-col gap-1">
+            <SplitNavButton leftLabel="Recep." rightLabel="Ordenes" path="/recepciones" />
           </div>
 
-          <div className="mt-[10px] flex w-[120px]  flex-col gap-4">
-            <NavButton label="Inventarios M.P." color="bg-[#5A9A20]" />
-            <NavButton label="Cuentas x Pagar" color="bg-[#A06020]" path="/proveedores" />
+          <div className="mt-[10px] flex w-[120px] flex-col gap-1">
+            <NavButton
+              label="Inventarios M.P."
+              gradient="from-[#f39c41] to-[#d5671b]"
+              borderColor="border-[#a14a0c]"
+              shadowColor="shadow-[#91460c]"
+            />
+            <NavButton
+              label="Cuentas x Pagar"
+              gradient="from-[#e75595] to-[#b73167]"
+              borderColor="border-[#8e2b54]"
+              shadowColor="shadow-[#7c2849]"
+              path="/proveedores"
+            />
           </div>
 
-          <div className="mt-0 flex w-[120px] flex-col gap-4">
-            <NavButton label="Produccion" color="bg-[#6B8E23]" />
-            <NavButton label="Contabilidad" color="bg-[#2E8B57]" path="/contabilidad" />
-            <NavButton label="Bancos" color="bg-[#7040A0]" path="/bancos" />
+          <div className="mt-0 flex w-[120px] flex-col gap-1">
+            <NavButton
+              label="Producción"
+              gradient="from-[#c8a14a] to-[#9c7321]"
+              borderColor="border-[#7f5d1b]"
+              shadowColor="shadow-[#6c4e16]"
+            />
+            <NavButton
+              label="Contabilidad"
+              gradient="from-[#6ea84f] to-[#4b7d2e]"
+              borderColor="border-[#3c6624]"
+              shadowColor="shadow-[#32541e]"
+              path="/contabilidad"
+            />
+            <NavButton
+              label="Bancos"
+              gradient="from-[#c465cd] to-[#9947a2]"
+              borderColor="border-[#75367f]"
+              shadowColor="shadow-[#6c2e75]"
+              path="/bancos"
+            />
           </div>
 
-          <div className="mt-[10px] flex w-[120px] flex-col gap-4">
-            <NavButton label="Inventarios P.T." color="bg-[#20A090]" path="/inventarios"/>
-            <NavButton label="Cuentas x Cobrar" color="bg-[#C03080]" path="/clientes" />
+          <div className="mt-[10px] flex w-[120px] flex-col gap-1">
+            <NavButton
+              label="Inventarios P.T."
+              gradient="from-[#70d9ea] to-[#2e9db8]"
+              borderColor="border-[#2b7587]"
+              shadowColor="shadow-[#286b7b]"
+              path="/inventarios"
+            />
+            <NavButton
+              label="Cuentas x Cobrar"
+              gradient="from-[#4f9cf1] to-[#286bc7]"
+              borderColor="border-[#22549a]"
+              shadowColor="shadow-[#1f4a8a]"
+              path="/clientes"
+            />
           </div>
 
-          <div className="mt-4 flex w-30 flex-col gap-4">
-            <NavButton label="Pedidos | Factura" color="bg-[#204080]" path="/ventas" />
+          <div className="mt-4 flex w-30 flex-col gap-1">
+            <SplitNavButton leftLabel="Pedidos" rightLabel="Factura" path="/ventas" className="w-[120px]" variant="blue" />
           </div>
         </div>
 

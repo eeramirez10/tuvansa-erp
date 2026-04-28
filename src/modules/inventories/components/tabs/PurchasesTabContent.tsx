@@ -3,7 +3,7 @@ import { asText } from "../../utils/asText";
 import { formatFixed } from "../../utils/formatFixed";
 import { formatInteger } from "../../utils/formatInteger";
 import { formatLegacyDate } from "../../utils/formatLegacyDate";
-import { Field } from "../ui/Field";
+import { LegacyInput } from "../../../shared/components/legacy-form/LegacyInput";
 
 function LegacyCheckbox({ checked = false }: { checked?: boolean }) {
   return (
@@ -34,21 +34,21 @@ export function PurchasesTabContent({ purchases }: Props) {
   const isForecast = false;
   
   return (
-    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] bg-[#efefef] text-[11px] font-bold text-[#2f3a44]">
-      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] font-bold text-white">
+    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] text-[11px] text-[#2f3a44]">
+      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] text-white">
         Compras
       </div>
 
       <div className="w-[980px] px-[16px] pt-[6px]">
         <div className="grid grid-cols-[66px_96px] items-center gap-x-[8px]">
           <span className="text-right">Último 5</span>
-          <Field value={formatFixed(purchases?.lastFiveCost, 4)} w="w-[96px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(purchases?.lastFiveCost, 4)} w="w-[96px]" align="right" />
         </div>
 
         <div className="mt-[7px] flex items-end gap-[66px]">
           <div className="flex items-center gap-[8px]">
             <span className="w-[106px] text-right">Moneda de origen</span>
-            <Field value={formatInteger(purchases?.originCurrency)} w="w-[34px]" align="center" />
+            <LegacyInput readOnly value={formatInteger(purchases?.originCurrency)} w="w-[34px]" align="center" />
           </div>
           <div>
             <span className="mb-[1px] block leading-[11px]">
@@ -56,7 +56,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               Origen
             </span>
-            <Field value={asText(purchases?.originPlace)} w="w-[64px]" />
+            <LegacyInput readOnly value={asText(purchases?.originPlace)} w="w-[64px]" />
           </div>
         </div>
 
@@ -68,16 +68,16 @@ export function PurchasesTabContent({ purchases }: Props) {
               <span>Caja</span>
             </div>
             <div className="flex items-center gap-[2px]">
-              <Field value={formatFixed(purchases?.originCubicMeters, 3)} w="w-[90px]" />
-              <Field value={formatInteger(purchases?.originBox)} w="w-[94px]" />
-              <Field value={asText(purchases?.ediPack)} w="w-[42px]" />
+              <LegacyInput readOnly value={formatFixed(purchases?.originCubicMeters, 3)} w="w-[90px]" />
+              <LegacyInput readOnly value={formatInteger(purchases?.originBox)} w="w-[94px]" />
+              <LegacyInput readOnly value={asText(purchases?.ediPack)} w="w-[42px]" />
             </div>
           </div>
 
           <div className="grid grid-cols-[220px_42px_102px_22px] gap-x-[10px]">
             <div>
               <span className="mb-[1px] block">Proveedor</span>
-              <Field
+              <LegacyInput readOnly
                 value={asText(purchases?.provider)}
                 title={asText(purchases?.provider)}
                 w="w-[220px]"
@@ -86,15 +86,15 @@ export function PurchasesTabContent({ purchases }: Props) {
             </div>
             <div>
               <span className="mb-[1px] block">%</span>
-              <Field value={formatFixed(purchases?.providerPercent, 2)} w="w-[42px]" />
+              <LegacyInput readOnly value={formatFixed(purchases?.providerPercent, 2)} w="w-[42px]" />
             </div>
             <div>
               <span className="mb-[1px] block">Código</span>
-              <Field value={asText(purchases?.code)} w="w-[92px]" />
+              <LegacyInput readOnly value={asText(purchases?.code)} w="w-[92px]" />
             </div>
             <div>
               <span className="mb-[1px] block">Tipo</span>
-              <Field value={formatInteger(purchases?.type)} w="w-[22px]" />
+              <LegacyInput readOnly value={formatInteger(purchases?.type)} w="w-[22px]" />
             </div>
           </div>
         </div>
@@ -104,28 +104,28 @@ export function PurchasesTabContent({ purchases }: Props) {
             <div className="mb-[1px] flex items-center gap-[16px]">
               <span className="w-[44px] text-left">Unidad</span>
               <span>Equivale a:</span>
-              <Field value={asText(purchases?.equivalentUnit)} w="w-[34px]" />
+              <LegacyInput readOnly value={asText(purchases?.equivalentUnit)} w="w-[34px]" />
             </div>
             <div className="flex items-center gap-[6px]">
-              <Field value={asText(purchases?.unit)} w="w-[48px]" />
-              <Field value={formatFixed(purchases?.equivalentTo, 2)} w="w-[76px]" />
+              <LegacyInput readOnly value={asText(purchases?.unit)} w="w-[48px]" />
+              <LegacyInput readOnly value={formatFixed(purchases?.equivalentTo, 2)} w="w-[76px]" />
             </div>
           </div>
 
           <div>
             <span className="mb-[1px] block">Precio</span>
-            <Field value={formatFixed(purchases?.price, 4)} w="w-[96px]" />
+            <LegacyInput readOnly value={formatFixed(purchases?.price, 4)} w="w-[96px]" />
           </div>
         </div>
 
         <div className="mt-[8px] grid grid-cols-[100px_92px_70px_98px_98px_92px] gap-x-[10px]">
           <div>
             <span className="mb-[1px] block">Fin de temporada</span>
-            <Field value={formatLegacyDate(purchases?.endSeasonAt ?? null)} w="w-[90px]" />
+            <LegacyInput readOnly value={formatLegacyDate(purchases?.endSeasonAt ?? null)} w="w-[90px]" />
           </div>
           <div>
             <span className="mb-[1px] block">Compra mínima</span>
-            <Field value={formatInteger(purchases?.minimumPurchase)} w="w-[90px]" />
+            <LegacyInput readOnly value={formatInteger(purchases?.minimumPurchase)} w="w-[90px]" />
           </div>
           <div>
             <span className="mb-[1px] block leading-[11px]">
@@ -133,7 +133,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               temporada
             </span>
-            <Field value={formatInteger(purchases?.seasonCurve)} w="w-[70px]" />
+            <LegacyInput readOnly value={formatInteger(purchases?.seasonCurve)} w="w-[70px]" />
           </div>
           <div>
             <span className="mb-[1px] block leading-[11px]">
@@ -141,7 +141,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               tienda
             </span>
-            <Field value={formatFixed(purchases?.storeWeeksFactor, 2)} w="w-[98px]" />
+            <LegacyInput readOnly value={formatFixed(purchases?.storeWeeksFactor, 2)} w="w-[98px]" />
           </div>
           <div>
             <span className="mb-[1px] block leading-[11px]">
@@ -149,7 +149,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               bodega
             </span>
-            <Field value={formatFixed(purchases?.warehouseWeeksFactor, 2)} w="w-[98px]" />
+            <LegacyInput readOnly value={formatFixed(purchases?.warehouseWeeksFactor, 2)} w="w-[98px]" />
           </div>
           <div>
             <span className="mb-[1px] block leading-[11px]">
@@ -157,7 +157,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               (días)
             </span>
-            <Field value={formatFixed(purchases?.supplierLeadTimeDays, 6)} w="w-[92px]" />
+            <LegacyInput readOnly value={formatFixed(purchases?.supplierLeadTimeDays, 6)} w="w-[92px]" />
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export function PurchasesTabContent({ purchases }: Props) {
           <div>
             <div className="flex items-center gap-[6px]">
               <span className="w-[104px] text-right">Cant. en 1 prepack</span>
-              <Field value={formatInteger(purchases?.quantityInPrepack)} w="w-[38px]" align="right" />
+              <LegacyInput readOnly value={formatInteger(purchases?.quantityInPrepack)} w="w-[38px]" align="right" />
             </div>
 
             <div className="mt-[4px] ml-[112px] grid gap-[2px] text-[#7f848a]">
@@ -204,7 +204,7 @@ export function PurchasesTabContent({ purchases }: Props) {
 
           <div>
             <span className="mb-[1px] block">Climas</span>
-            <Field value={asText(purchases?.climates)} w="w-[130px]" />
+            <LegacyInput readOnly value={asText(purchases?.climates)} w="w-[130px]" />
           </div>
 
           <div>
@@ -213,7 +213,7 @@ export function PurchasesTabContent({ purchases }: Props) {
               <br />
               prepacks
             </span>
-            <Field value={formatInteger(purchases?.prepackCount)} w="w-[68px]" align="right" />
+            <LegacyInput readOnly value={formatInteger(purchases?.prepackCount)} w="w-[68px]" align="right" />
           </div>
         </div>
       </div>

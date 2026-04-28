@@ -18,8 +18,8 @@ export const InventoryTabsNav:React.FC<Props> = ({ activeTab, onChangeTab}) => {
           type="button"
           onClick={() => onChangeTab(tab.key)}
           className={[
-            "h-[24px] border border-[#a2aab2] px-[10px] text-[11px] leading-[22px] font-semibold",
-            activeTab === tab.key ? "bg-[#1579ba] text-white" : "bg-[#dedede] text-[#3f464f]",
+            "h-[24px]  px-[10px] text-[11px] leading-[22px] font-semibold transition-colors ease-linear duration-200 ",
+            activeTab === tab.key ? "bg-[#1579ba] text-white" : " text-[#3f464f]",
           ].join(" ")}
         >
           {tab.label}

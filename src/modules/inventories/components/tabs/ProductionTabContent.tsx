@@ -3,7 +3,7 @@ import { asText } from "../../utils/asText";
 import { formatFixed } from "../../utils/formatFixed";
 import { formatInteger } from "../../utils/formatInteger";
 import { formatLegacyDate } from "../../utils/formatLegacyDate";
-import { Field } from "../ui/Field";
+import { LegacyInput } from "../../../shared/components/legacy-form/LegacyInput";
 
 function LegacyCheckbox({ checked = false }: { checked?: boolean }) {
   return (
@@ -19,8 +19,8 @@ type Props = {
 
 export const ProductionTabContent = ({ production }: Props) => {
   return (
-    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] bg-[#efefef] text-[11px] font-normal text-[#2f3a44]">
-      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] font-bold text-white">
+    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] text-[11px] font-normal text-[#2f3a44]">
+      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] text-white">
         Datos de producción
       </div>
 
@@ -32,15 +32,15 @@ export const ProductionTabContent = ({ production }: Props) => {
 
         <div className="grid w-[236px] grid-cols-[72px_96px_60px] items-center gap-x-[8px] gap-y-[6px]">
           <span className="text-right">Lote</span>
-          <Field value={formatFixed(production?.lot, 4)} w="w-[76px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(production?.lot, 4)} w="w-[76px]" align="right" />
           <span />
 
           <span className="text-right">Tiempo</span>
-          <Field value={formatFixed(production?.timeDays, 6)} w="w-[76px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(production?.timeDays, 6)} w="w-[76px]" align="right" />
           <span>días</span>
 
           <span className="text-right">Capacidad</span>
-          <Field value={formatInteger(production?.capacity)} w="w-[76px]" align="right" />
+          <LegacyInput readOnly value={formatInteger(production?.capacity)} w="w-[76px]" align="right" />
           <span />
         </div>
 
@@ -56,9 +56,9 @@ export const ProductionTabContent = ({ production }: Props) => {
 
         <div className="mt-[12px] grid w-[236px] grid-cols-[104px_96px] items-center gap-x-[8px] gap-y-[4px]">
           <span className="text-right">Código segundas</span>
-          <Field value={asText(production?.secondCode)} w="w-[96px]" />
+          <LegacyInput readOnly value={asText(production?.secondCode)} w="w-[96px]" />
           <span className="text-right">Código terceras</span>
-          <Field value={asText(production?.thirdCode)} w="w-[96px]" />
+          <LegacyInput readOnly value={asText(production?.thirdCode)} w="w-[96px]" />
         </div>
 
         <div className="mt-[10px] ml-[104px] grid gap-y-[4px] text-[#7c8188]">

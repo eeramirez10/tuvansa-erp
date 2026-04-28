@@ -4,7 +4,7 @@ import { asText } from "../utils/asText";
 import { formatFixed } from "../utils/formatFixed";
 import { formatInteger } from "../utils/formatInteger";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
-import { Field } from "./ui/Field";
+import { LegacyInput } from "../../shared/components/legacy-form/LegacyInput";
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -77,38 +77,38 @@ function InventoryOthersModal() {
                   <div className="grid grid-cols-[250px_238px] gap-x-[14px]">
                     <div className="grid grid-cols-[112px_116px] items-center gap-x-[8px] gap-y-[4px]">
                       <span className="text-right">Volumen</span>
-                      <Field value={formatFixed(dimensions?.volume, 6)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.volume, 6)} w="w-[116px]" />
                       <span className="text-right">Peso</span>
-                      <Field value={formatFixed(dimensions?.weight, 6)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.weight, 6)} w="w-[116px]" />
                       <span className="text-right">Caja genérica</span>
-                      <Field value={formatFixed(dimensions?.genericBox, 2)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.genericBox, 2)} w="w-[116px]" />
                       <span className="text-right">Empaque</span>
-                      <Field value={formatFixed(dimensions?.pack, 2)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.pack, 2)} w="w-[116px]" />
                       <span className="text-right">Largo</span>
-                      <Field value={formatFixed(dimensions?.length, 2)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.length, 2)} w="w-[116px]" />
                       <span className="text-right">Alto</span>
-                      <Field value={formatFixed(dimensions?.height, 2)} w="w-[116px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.height, 2)} w="w-[116px]" />
                     </div>
 
                     <div className="grid grid-cols-[136px_94px] items-center gap-x-[8px] gap-y-[4px]">
                       <span className="text-right">Empaque EDI</span>
-                      <Field value={asText(dimensions?.ediPack)} w="w-[94px]" />
+                      <LegacyInput readOnly value={asText(dimensions?.ediPack)} w="w-[94px]" />
                       <span className="text-right">Cantidad EDI</span>
-                      <Field value={formatInteger(dimensions?.ediQuantity)} w="w-[94px]" />
+                      <LegacyInput readOnly value={formatInteger(dimensions?.ediQuantity)} w="w-[94px]" />
                       <span className="text-right">Densidad K/L</span>
-                      <Field value={formatFixed(dimensions?.densityKl, 6)} w="w-[94px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.densityKl, 6)} w="w-[94px]" />
                       <span className="text-right">Peso K/M -</span>
-                      <Field value={formatFixed(dimensions?.weightKmKpz, 6)} w="w-[94px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.weightKmKpz, 6)} w="w-[94px]" />
                       <span className="text-right">Ancho</span>
-                      <Field value={formatFixed(dimensions?.width, 2)} w="w-[94px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.width, 2)} w="w-[94px]" />
                       <span className="text-right">P.P.P.</span>
-                      <Field value={formatFixed(dimensions?.pointsPerInch, 2)} w="w-[94px]" />
+                      <LegacyInput readOnly value={formatFixed(dimensions?.pointsPerInch, 2)} w="w-[94px]" />
                     </div>
                   </div>
 
                   <div className="mt-[4px] grid grid-cols-[148px_240px] items-center gap-x-[8px]">
                     <span className="text-right">Localización</span>
-                    <Field value={asText(storage?.location)} w="w-[240px]" />
+                    <LegacyInput readOnly value={asText(storage?.location)} w="w-[240px]" />
                   </div>
                 </div>
               </section>
@@ -118,7 +118,7 @@ function InventoryOthersModal() {
                 <div className="p-[12px]">
                   <div className="mb-[4px]">
                     <div className="mb-[2px]">Composición</div>
-                    <Field value={asText(options?.composition)} w="w-[400px]" />
+                    <LegacyInput readOnly value={asText(options?.composition)} w="w-[400px]" />
                   </div>
 
                   <div className="grid grid-cols-[430px_200px_200px] gap-x-[12px]">
@@ -144,42 +144,42 @@ function InventoryOthersModal() {
 
                       <div className="mt-[8px] grid grid-cols-[160px_86px] items-center gap-x-[6px]">
                         <span className="text-right">Usuario último cambio</span>
-                        <Field value={formatInteger(options?.lastChangedBy)} w="w-[86px]" />
+                        <LegacyInput readOnly value={formatInteger(options?.lastChangedBy)} w="w-[86px]" />
                       </div>
                     </div>
 
                     <div className="grid content-start grid-cols-[74px_126px] items-center gap-x-[6px] gap-y-[4px]">
                       <span className="text-right font-semibold">Bodega</span>
-                      <Field value={formatInteger(options?.warehouse)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatInteger(options?.warehouse)} w="w-[126px]" />
                       <span className="text-right font-semibold leading-[11px]">Próxima recep.</span>
-                      <Field value={formatLegacyDate(options?.nextReceptionAt ?? null)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatLegacyDate(options?.nextReceptionAt ?? null)} w="w-[126px]" />
                       <span className="text-right">Tránsit</span>
-                      <Field value={formatFixed(options?.transit, 2)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatFixed(options?.transit, 2)} w="w-[126px]" />
                       <span className="text-right font-semibold leading-[11px]">Físico Inc.</span>
-                      <Field value={formatFixed(options?.physicalInitial, 4)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatFixed(options?.physicalInitial, 4)} w="w-[126px]" />
                     </div>
 
                     <div className="grid content-start grid-cols-[74px_126px] items-center gap-x-[6px] gap-y-[4px]">
                       <span className="text-right leading-[11px]">Último cambio</span>
-                      <Field value={formatLegacyDate(options?.lastChangedAt ?? null)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatLegacyDate(options?.lastChangedAt ?? null)} w="w-[126px]" />
                       <span className="text-right leading-[11px]">Cambio l.1,2,3</span>
-                      <Field value={formatLegacyDate(options?.list123ChangedAt ?? null)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatLegacyDate(options?.list123ChangedAt ?? null)} w="w-[126px]" />
                       <span className="text-right leading-[11px]">No surtidos</span>
-                      <Field value={formatFixed(options?.unsupplied, 2)} w="w-[126px]" align="right" />
+                      <LegacyInput readOnly value={formatFixed(options?.unsupplied, 2)} w="w-[126px]" align="right" />
                       <span className="text-right leading-[11px]">Primer vta pos</span>
-                      <Field value={formatLegacyDate(options?.firstPosSaleAt ?? null)} w="w-[126px]" />
+                      <LegacyInput readOnly value={formatLegacyDate(options?.firstPosSaleAt ?? null)} w="w-[126px]" />
                       <span className="text-right">Conteo</span>
-                      <Field value={formatFixed(options?.countInventory, 4)} w="w-[126px]" align="right" />
+                      <LegacyInput readOnly value={formatFixed(options?.countInventory, 4)} w="w-[126px]" align="right" />
                     </div>
                   </div>
 
                   <div className="mt-[10px] grid grid-cols-[78px_40px_58px_140px_60px_376px] items-center gap-x-[8px]">
                     <span className="text-right">renglon</span>
-                    <Field value={asText(options?.row)} w="w-[40px]" align="center" />
+                    <LegacyInput readOnly value={asText(options?.row)} w="w-[40px]" align="center" />
                     <span className="text-right">Raíz</span>
-                    <Field value={asText(options?.rootCode)} w="w-[140px]" />
+                    <LegacyInput readOnly value={asText(options?.rootCode)} w="w-[140px]" />
                     <span className="text-right">Color</span>
-                    <Field value={asText(options?.color)} w="w-[376px]" />
+                    <LegacyInput readOnly value={asText(options?.color)} w="w-[376px]" />
                   </div>
                 </div>
               </section>
@@ -211,45 +211,45 @@ function InventoryOthersModal() {
                     {priceRows.map((row) => (
                       <div key={row.list} className="contents">
                         <span className="text-right">Lista {row.list}</span>
-                        <Field value={formatFixed(row.price, 4)} w="w-[74px]" align="right" />
-                        <Field value={formatInteger(row.currency)} w="w-[40px]" align="right" />
-                        <Field value={formatFixed(row.percent, 2)} w="w-[30px]" align="right" />
+                        <LegacyInput readOnly value={formatFixed(row.price, 4)} w="w-[74px]" align="right" />
+                        <LegacyInput readOnly value={formatInteger(row.currency)} w="w-[40px]" align="right" />
+                        <LegacyInput readOnly value={formatFixed(row.percent, 2)} w="w-[30px]" align="right" />
                       </div>
                     ))}
                   </div>
 
                   <div className="mt-[4px] grid grid-cols-[58px_66px_14px_66px_30px_64px] items-center gap-x-[3px]">
                     <span className="text-right">Oferta del</span>
-                    <Field value={formatLegacyDate(othersPrices?.offerFrom ?? null)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatLegacyDate(othersPrices?.offerFrom ?? null)} w="w-[66px]" />
                     <span>Al</span>
-                    <Field value={formatLegacyDate(othersPrices?.offerTo ?? null)} w="w-[66px]" />
-                    <Field value={formatFixed(othersPrices?.walletPercent, 2)} w="w-[30px]" />
+                    <LegacyInput readOnly value={formatLegacyDate(othersPrices?.offerTo ?? null)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatFixed(othersPrices?.walletPercent, 2)} w="w-[30px]" />
                     <span>%(6 lista 10)</span>
                   </div>
 
                   <div className="mt-[2px] grid grid-cols-[58px_66px] items-center gap-x-[3px]">
                     <span className="text-right">Mínimo Hasta</span>
-                    <Field value={formatLegacyDate(othersPrices?.minUntil ?? null)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatLegacyDate(othersPrices?.minUntil ?? null)} w="w-[66px]" />
                   </div>
 
                   <div className="mt-[2px] grid grid-cols-[58px_66px] items-center gap-x-[3px]">
                     <span className="text-right">% Monedero</span>
-                    <Field value={formatFixed(othersPrices?.walletPercent, 2)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatFixed(othersPrices?.walletPercent, 2)} w="w-[66px]" />
                   </div>
 
                   <div className="mt-[4px] grid grid-cols-[58px_66px] items-center gap-x-[3px]">
                     <span className="text-right">% Comisión</span>
-                    <Field value={formatFixed(othersPrices?.commissionPercent, 2)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatFixed(othersPrices?.commissionPercent, 2)} w="w-[66px]" />
                   </div>
 
                   <div className="mt-[2px] grid grid-cols-[58px_66px] items-center gap-x-[3px]">
                     <span className="text-right">% IEPS</span>
-                    <Field value={formatFixed(othersPrices?.iepsPercent, 6)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatFixed(othersPrices?.iepsPercent, 6)} w="w-[66px]" />
                   </div>
 
                   <div className="mt-[2px] grid grid-cols-[58px_66px] items-center gap-x-[3px]">
                     <span className="text-right">% IEPS FIJO</span>
-                    <Field value={formatFixed(othersPrices?.fixedIepsPercent, 2)} w="w-[66px]" />
+                    <LegacyInput readOnly value={formatFixed(othersPrices?.fixedIepsPercent, 2)} w="w-[66px]" />
                   </div>
 
                   <div className="mt-[6px] flex items-center justify-center gap-[10px] text-[#848a90]">
@@ -281,13 +281,13 @@ function InventoryOthersModal() {
                       </label>
                       <div className="grid grid-cols-[68px_102px] items-center gap-x-[6px] gap-y-[2px]">
                         <span className="text-right">Pedimento</span>
-                        <Field value={asText(imports?.pedimento)} w="w-[102px]" />
+                        <LegacyInput readOnly value={asText(imports?.pedimento)} w="w-[102px]" />
                         <span className="text-right">Fecha</span>
-                        <Field value={formatLegacyDate(imports?.importDate ?? null)} w="w-[102px]" />
+                        <LegacyInput readOnly value={formatLegacyDate(imports?.importDate ?? null)} w="w-[102px]" />
                         <span className="text-right">Aduana</span>
-                        <Field value={asText(imports?.customsOffice)} w="w-[102px]" />
+                        <LegacyInput readOnly value={asText(imports?.customsOffice)} w="w-[102px]" />
                         <span className="text-right">Arancel</span>
-                        <Field value={asText(imports?.tariff)} w="w-[102px]" />
+                        <LegacyInput readOnly value={asText(imports?.tariff)} w="w-[102px]" />
                       </div>
                       <div className="mt-[3px] ml-[74px] inline-flex h-[18px] w-[110px] items-center justify-between border border-[#a7adb3] bg-[#f6f6f6] px-[4px] text-[11px]">
                         <span>{asText(imports?.tariffOption)}</span>
@@ -295,8 +295,8 @@ function InventoryOthersModal() {
                       </div>
                       <div className="mt-[3px] grid grid-cols-[68px_44px_42px] items-center gap-x-[6px]">
                         <span className="text-right">% Arancel</span>
-                        <Field value={formatFixed(imports?.tariffPercent, 2)} w="w-[44px]" />
-                        <Field value={formatFixed(imports?.tariffAmount, 0)} w="w-[42px]" />
+                        <LegacyInput readOnly value={formatFixed(imports?.tariffPercent, 2)} w="w-[44px]" />
+                        <LegacyInput readOnly value={formatFixed(imports?.tariffAmount, 0)} w="w-[42px]" />
                       </div>
                     </div>
                   </section>
@@ -306,9 +306,9 @@ function InventoryOthersModal() {
                     <div className="p-[6px]">
                       <div className="grid grid-cols-[56px_78px] items-center gap-x-[6px] gap-y-[2px]">
                         <span className="text-right">Arancel</span>
-                        <Field value={asText(exportData?.tariff)} w="w-[78px]" />
+                        <LegacyInput readOnly value={asText(exportData?.tariff)} w="w-[78px]" />
                         <span className="text-right">Factor</span>
-                        <Field value={formatFixed(exportData?.factor, 6)} w="w-[78px]" />
+                        <LegacyInput readOnly value={formatFixed(exportData?.factor, 6)} w="w-[78px]" />
                       </div>
                       <button
                         type="button"
@@ -344,25 +344,25 @@ function InventoryOthersModal() {
                       </label>
                       <div className="grid grid-cols-[80px_46px_16px] items-center gap-x-[6px] gap-y-[2px]">
                         <span className="text-right">Lote</span>
-                        <Field value={formatFixed(production?.lot, 4)} w="w-[46px]" align="right" />
+                        <LegacyInput readOnly value={formatFixed(production?.lot, 4)} w="w-[46px]" align="right" />
                         <span />
                         <span className="text-right">Tiempo</span>
-                        <Field value={formatFixed(production?.timeDays, 6)} w="w-[46px]" align="right" />
+                        <LegacyInput readOnly value={formatFixed(production?.timeDays, 6)} w="w-[46px]" align="right" />
                         <span>día</span>
                         <span className="text-right">Capacidad</span>
-                        <Field value={formatInteger(production?.capacity)} w="w-[46px]" align="right" />
+                        <LegacyInput readOnly value={formatInteger(production?.capacity)} w="w-[46px]" align="right" />
                         <span />
                       </div>
                       <div className="mt-[2px] grid grid-cols-[80px_46px_28px] items-center gap-x-[6px]">
                         <span className="text-right">Ensamble</span>
-                        <Field value={formatLegacyDate(production?.assemblyAt ?? null)} w="w-[46px]" />
-                        <Field value={formatInteger(production?.assemblyMode)} w="w-[28px]" />
+                        <LegacyInput readOnly value={formatLegacyDate(production?.assemblyAt ?? null)} w="w-[46px]" />
+                        <LegacyInput readOnly value={formatInteger(production?.assemblyMode)} w="w-[28px]" />
                       </div>
                       <div className="mt-[3px] grid grid-cols-[80px_66px] items-center gap-x-[6px] gap-y-[2px]">
                         <span className="text-right">Código segundas</span>
-                        <Field value={asText(production?.secondCode)} w="w-[66px]" />
+                        <LegacyInput readOnly value={asText(production?.secondCode)} w="w-[66px]" />
                         <span className="text-right">Código terceras</span>
-                        <Field value={asText(production?.thirdCode)} w="w-[66px]" />
+                        <LegacyInput readOnly value={asText(production?.thirdCode)} w="w-[66px]" />
                       </div>
                       <div className="mt-[3px] ml-[46px] grid gap-y-[2px] text-[#7b8188]">
                         <label className="inline-flex items-center gap-[4px]">
@@ -397,9 +397,9 @@ function InventoryOthersModal() {
                       </div>
                       <div className="grid grid-cols-[120px_48px] items-center gap-x-[5px] gap-y-[2px]">
                         <span className="text-right">Clave de material peligroso:</span>
-                        <Field value={asText(ccp?.hazardousKey)} w="w-[48px]" />
+                        <LegacyInput readOnly value={asText(ccp?.hazardousKey)} w="w-[48px]" />
                         <span className="text-right">Clave de embalaje:</span>
-                        <Field value={asText(ccp?.packagingKey)} w="w-[48px]" />
+                        <LegacyInput readOnly value={asText(ccp?.packagingKey)} w="w-[48px]" />
                       </div>
                     </div>
                   </section>
@@ -413,58 +413,58 @@ function InventoryOthersModal() {
                 <div className="flex items-end gap-[10px]">
                   <div className="w-[102px]">
                     <span className="mb-[1px] block whitespace-nowrap">Moneda de origen</span>
-                    <Field value={formatInteger(purchases?.originCurrency)} w="w-[40px]" align="right" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.originCurrency)} w="w-[40px]" align="right" />
                   </div>
                   <div className="w-[72px]">
                     <span className="mb-[1px] block leading-[11px]">Lugar de<br />Origen</span>
-                    <Field value={asText(purchases?.originPlace)} w="w-[66px]" />
+                    <LegacyInput readOnly value={asText(purchases?.originPlace)} w="w-[66px]" />
                   </div>
                   <div className="w-[66px]">
                     <span className="mb-[1px] block whitespace-nowrap">Proveedor</span>
-                    <Field value={providerShort} w="w-[66px]" />
+                    <LegacyInput readOnly value={providerShort} w="w-[66px]" />
                   </div>
                   <div className="w-[60px]">
                     <span className="mb-[1px] block whitespace-nowrap">% Regalías</span>
-                    <Field value={formatFixed(0, 2)} w="w-[60px]" />
+                    <LegacyInput readOnly value={formatFixed(0, 2)} w="w-[60px]" />
                   </div>
                   <div className="w-[124px]">
                     <span className="mb-[1px] block whitespace-nowrap">Código proveedor</span>
-                    <Field value={asText(purchases?.code)} w="w-[124px]" />
+                    <LegacyInput readOnly value={asText(purchases?.code)} w="w-[124px]" />
                   </div>
                   <div className="w-[44px]">
                     <span className="mb-[1px] block whitespace-nowrap">Tipo</span>
-                    <Field value={formatInteger(purchases?.type)} w="w-[44px]" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.type)} w="w-[44px]" />
                   </div>
                   <div className="w-[102px]">
                     <span className="mb-[1px] block whitespace-nowrap">Climas</span>
-                    <Field value={asText(purchases?.climates)} w="w-[102px]" />
+                    <LegacyInput readOnly value={asText(purchases?.climates)} w="w-[102px]" />
                   </div>
                 </div>
 
                 <div className="flex items-end gap-[10px]">
                   <div className="w-[102px]">
                     <span className="mb-[1px] block whitespace-nowrap">M. cúbicos</span>
-                    <Field value={formatFixed(purchases?.originCubicMeters, 3)} w="w-[102px]" />
+                    <LegacyInput readOnly value={formatFixed(purchases?.originCubicMeters, 3)} w="w-[102px]" />
                   </div>
                   <div className="w-[132px]">
                     <span className="mb-[1px] block whitespace-nowrap">Caja genérica de origen</span>
-                    <Field value={formatInteger(purchases?.originBox)} w="w-[92px]" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.originBox)} w="w-[92px]" />
                   </div>
                   <div className="w-[44px]">
                     <span className="mb-[1px] block whitespace-nowrap">Unidad</span>
-                    <Field value={asText(purchases?.unit)} w="w-[44px]" />
+                    <LegacyInput readOnly value={asText(purchases?.unit)} w="w-[44px]" />
                   </div>
                   <div className="w-[56px]">
                     <span className="mb-[1px] block whitespace-nowrap">Equivale</span>
-                    <Field value={formatInteger(purchases?.equivalentTo)} w="w-[56px]" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.equivalentTo)} w="w-[56px]" />
                   </div>
                   <div className="w-[30px]">
                     <span className="mb-[1px] block whitespace-nowrap">M</span>
-                    <Field value={asText(purchases?.equivalentUnit)} w="w-[30px]" align="center" />
+                    <LegacyInput readOnly value={asText(purchases?.equivalentUnit)} w="w-[30px]" align="center" />
                   </div>
                   <div className="w-[82px]">
                     <span className="mb-[1px] block whitespace-nowrap">Precio compra</span>
-                    <Field value={formatFixed(purchases?.price, 4)} w="w-[82px]" />
+                    <LegacyInput readOnly value={formatFixed(purchases?.price, 4)} w="w-[82px]" />
                   </div>
                   <label className="inline-flex items-center gap-[4px] pb-[2px] text-[#7b8188]">
                     <LegacyCheckbox checked={Boolean(purchases?.inactive)} />
@@ -483,39 +483,39 @@ function InventoryOthersModal() {
                 <div className="flex items-end gap-[10px]">
                   <div className="w-[102px]">
                     <span className="mb-[1px] block whitespace-nowrap">Fin de temporada</span>
-                    <Field value={formatLegacyDate(purchases?.endSeasonAt ?? null)} w="w-[102px]" />
+                    <LegacyInput readOnly value={formatLegacyDate(purchases?.endSeasonAt ?? null)} w="w-[102px]" />
                   </div>
                   <div className="w-[94px]">
                     <span className="mb-[1px] block whitespace-nowrap">Compra mínima</span>
-                    <Field value={formatInteger(purchases?.minimumPurchase)} w="w-[94px]" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.minimumPurchase)} w="w-[94px]" />
                   </div>
                   <div className="w-[78px]">
                     <span className="mb-[1px] block leading-[11px]">Curva de<br />temporada</span>
-                    <Field value={formatInteger(purchases?.seasonCurve)} w="w-[58px]" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.seasonCurve)} w="w-[58px]" />
                   </div>
                   <div className="w-[94px]">
                     <span className="mb-[1px] block leading-[11px]">Factor semanas en<br />tienda</span>
-                    <Field value={formatFixed(purchases?.storeWeeksFactor, 2)} w="w-[70px]" />
+                    <LegacyInput readOnly value={formatFixed(purchases?.storeWeeksFactor, 2)} w="w-[70px]" />
                   </div>
                   <div className="w-[94px]">
                     <span className="mb-[1px] block leading-[11px]">Factor semanas en<br />bodega</span>
-                    <Field value={formatFixed(purchases?.warehouseWeeksFactor, 2)} w="w-[70px]" />
+                    <LegacyInput readOnly value={formatFixed(purchases?.warehouseWeeksFactor, 2)} w="w-[70px]" />
                   </div>
                   <div className="w-[94px]">
                     <span className="mb-[1px] block leading-[11px]">Porcent sem<br />Inv=0</span>
-                    <Field value={formatFixed(0, 2)} w="w-[64px]" />
+                    <LegacyInput readOnly value={formatFixed(0, 2)} w="w-[64px]" />
                   </div>
                   <div className="w-[86px]">
                     <span className="mb-[1px] block leading-[11px]">Cant. en 1<br />prepack</span>
-                    <Field value={formatInteger(purchases?.quantityInPrepack)} w="w-[66px]" align="right" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.quantityInPrepack)} w="w-[66px]" align="right" />
                   </div>
                   <div className="w-[86px]">
                     <span className="mb-[1px] block leading-[11px]">Cant. de<br />prepacks</span>
-                    <Field value={formatInteger(purchases?.prepackCount)} w="w-[66px]" align="right" />
+                    <LegacyInput readOnly value={formatInteger(purchases?.prepackCount)} w="w-[66px]" align="right" />
                   </div>
                   <div className="w-[64px]">
                     <span className="mb-[1px] block leading-[11px]">Formato<br />tda</span>
-                    <Field value="" w="w-[64px]" />
+                    <LegacyInput readOnly value="" w="w-[64px]" />
                   </div>
                 </div>
 
@@ -550,7 +550,7 @@ function InventoryOthersModal() {
               <div className="p-[6px]">
                 <div className="inline-grid grid-cols-[64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px_64px] gap-[1px]">
                   {Array.from({ length: 17 }, (_, index) => vars[index] ?? null).map((value, index) => (
-                    <Field key={index} value={formatFixed(value, 4)} w="w-[64px]" align="center" />
+                    <LegacyInput readOnly key={index} value={formatFixed(value, 4)} w="w-[64px]" align="center" />
                   ))}
                 </div>
                 <div className="mt-[18px] ml-[1px] w-fit">
@@ -563,7 +563,7 @@ function InventoryOthersModal() {
                   </div>
                   <div className="mt-[4px] grid grid-cols-[64px_64px_64px_64px_64px] gap-[1px]">
                     {Array.from({ length: 5 }, (_, index) => vars[index + 17] ?? null).map((value, index) => (
-                      <Field key={index} value={formatFixed(value, 4)} w="w-[64px]" align="center" />
+                      <LegacyInput readOnly key={index} value={formatFixed(value, 4)} w="w-[64px]" align="center" />
                     ))}
                   </div>
                 </div>

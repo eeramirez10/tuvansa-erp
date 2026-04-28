@@ -1,7 +1,7 @@
 import { InventoryTaxes } from "../../types/inventory.types";
 import { asText } from "../../utils/asText";
 import { formatFixed } from "../../utils/formatFixed";
-import { Field } from "../ui/Field";
+import { LegacyInput } from "../../../shared/components/legacy-form/LegacyInput";
 
 function LegacyCheckbox({ checked = false }: { checked?: boolean }) {
   return (
@@ -28,26 +28,26 @@ export const TaxesTabContent = ({ taxes }: Props) => {
   const retentionType = taxes?.retentionType ?? "unknown";
 
   return (
-    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] bg-[#efefef] text-[11px] font-normal text-[#2f3a44]">
-      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] font-bold text-white">
+    <section className="mt-[4px] min-h-[518px] border border-[#b8c0c8] text-[11px] font-normal text-[#2f3a44]">
+      <div className="h-[23px] bg-[#1579ba] text-center text-[12px] leading-[21px] text-white">
         Impuestos
       </div>
 
       <div className="px-[48px] pt-[18px]">
         <div className="grid w-[150px] grid-cols-[86px_56px] items-center gap-x-[8px] gap-y-[4px]">
           <span className="text-right">Perfil Ventas</span>
-          <Field value={asText(taxes?.salesProfile)} w="w-[56px]" />
+          <LegacyInput readOnly value={asText(taxes?.salesProfile)} w="w-[56px]" />
           <span className="text-right">Perfil Compras</span>
-          <Field value={asText(taxes?.purchasesProfile)} w="w-[56px]" />
+          <LegacyInput readOnly value={asText(taxes?.purchasesProfile)} w="w-[56px]" />
         </div>
 
         <div className="mt-[14px] grid w-[152px] grid-cols-[88px_56px] items-center gap-x-[8px] gap-y-[4px]">
           <span className="text-right">% IEPS</span>
-          <Field value={formatFixed(taxes?.iepsPercent, 6)} w="w-[56px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(taxes?.iepsPercent, 6)} w="w-[56px]" align="right" />
           <span className="text-right">% Retención IVA</span>
-          <Field value={formatFixed(taxes?.retentionIvaPercent, 4)} w="w-[56px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(taxes?.retentionIvaPercent, 4)} w="w-[56px]" align="right" />
           <span className="text-right">% Retención ISR</span>
-          <Field value={formatFixed(taxes?.retentionIsrPercent, 4)} w="w-[56px]" align="right" />
+          <LegacyInput readOnly value={formatFixed(taxes?.retentionIsrPercent, 4)} w="w-[56px]" align="right" />
         </div>
 
         <div className="mt-[8px] ml-[67px] flex items-center gap-[14px] text-[#7c8188]">

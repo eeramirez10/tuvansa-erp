@@ -21,7 +21,12 @@ function ActionButton({ item }: { item: LegacyActionItem }) {
 }
 
 
-export function LegacyActionPanel({ title = "Acciones", items, className = "" }: LegacyActionsPanelProps) {
+export function LegacyActionPanel({
+  title = "Acciones",
+  bottomTitle,
+  items,
+  className = "",
+}: LegacyActionsPanelProps) {
 
   const topItems = items.filter(item => (item.section ?? "top") === 'top');
   const bottomItems = items.filter(item => item.section === 'bottom');
@@ -41,7 +46,13 @@ export function LegacyActionPanel({ title = "Acciones", items, className = "" }:
 
       {bottomItems.length > 0 ? (
         <>
-          <div className="my-[4px] border-t border-[#c3c8ce]" />
+          {bottomTitle ? (
+            <div className="my-[4px] h-[22px] border-b border-[#8db6d6] bg-[#1179ba] px-2 text-center text-[15px] leading-[22px] font-bold text-white">
+              {bottomTitle}
+            </div>
+          ) : (
+            <div className="my-[4px] border-t border-[#c3c8ce]" />
+          )}
           <div className="flex flex-col gap-[2px] px-[6px] pb-[6px]">
             {bottomItems.map((item) => (
               <ActionButton key={item.id} item={item} />

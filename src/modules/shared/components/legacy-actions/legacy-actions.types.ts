@@ -11,6 +11,7 @@ export type LegacyActionItem = {
 
 export type LegacyActionsPanelProps = {
   title?: string
+  bottomTitle?: string
   items: LegacyActionItem[],
   className?: string
 }

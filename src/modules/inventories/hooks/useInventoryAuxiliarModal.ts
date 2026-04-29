@@ -45,6 +45,18 @@ const mapAuxiliarToRow = (row: InventoryAuxiliarRow): AuxiliarRow => ({
   reference: row.reference,
 });
 
+const parseOptionalLegacyNumber = (rawValue: unknown): number | undefined => {
+  if (rawValue === undefined || rawValue === null || String(rawValue).trim() === "") {
+    return undefined;
+  }
+
+  const numericValue = Number(rawValue);
+  return Number.isFinite(numericValue) ? numericValue : undefined;
+};
+
+const LEGACY_DEST = parseOptionalLegacyNumber(import.meta.env.VITE_LEGACY_DEST) ?? 0;
+const LEGACY_MULTICIA = parseOptionalLegacyNumber(import.meta.env.VITE_LEGACY_MULTICIA) ?? 1;
+
 export const useInventoryAuxiliarModal = () => {
   const { isOpen, close } = useModal(MODAL_IDS.INVENTORY_AUXILIAR);
   const { selectedCode, detail } = useInventoriesStore(
@@ -58,8 +70,22 @@ export const useInventoryAuxiliarModal = () => {
   const [stockPrevious, setStockPrevious] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState("");
+  const [selectedRowKey, setSelectedRowKey] = useState<string | null>(null);
+  const [warehouseFilter, setWarehouseFilter] = useState<string | null>(null);
 
   const currentCode = (selectedCode ?? detail?.identity.code ?? "").trim();
+
+  useEffect(() => {
+    if (!isOpen) {
+      setRows([]);
+      setStockPrevious(0);
+      setError(null);
+      setSelectedWarehouse("");
+      setSelectedRowKey(null);
+      setWarehouseFilter(null);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -82,15 +108,21 @@ export const useInventoryAuxiliarModal = () => {
 
       try {
         const response = await getInventoryAuxiliarByCode(currentCode, {
+          alm: warehouseFilter ?? undefined,
+          dest: LEGACY_DEST,
+          multicia: LEGACY_MULTICIA,
           signal: abortController.signal,
         });
         if (!isCancelled) {
-          setRows(response.data.map(mapAuxiliarToRow));
+          const mappedRows = response.data.map(mapAuxiliarToRow);
+          setRows(mappedRows);
           setStockPrevious(
             response.meta.stockPrevious === undefined || Number.isNaN(response.meta.stockPrevious)
               ? 0
               : response.meta.stockPrevious,
           );
+          setSelectedWarehouse("");
+          setSelectedRowKey(null);
         }
       } catch (loadError) {
         if (loadError instanceof DOMException && loadError.name === "AbortError") {
@@ -115,7 +147,27 @@ export const useInventoryAuxiliarModal = () => {
       isCancelled = true;
       abortController.abort();
     };
-  }, [isOpen, currentCode]);
+  }, [isOpen, currentCode, warehouseFilter]);
+
+  const selectWarehouse = (warehouse: string) => {
+    setError(null);
+    setSelectedWarehouse(warehouse);
+  };
+
+  const selectRow = (rowKey: string, warehouse: string) => {
+    setSelectedRowKey(rowKey);
+    selectWarehouse(warehouse);
+  };
+
+  const filterBySelectedWarehouse = () => {
+    const normalizedWarehouse = selectedWarehouse.trim();
+    if (!normalizedWarehouse) {
+      setError("Selecciona un renglón antes de filtrar almacén.");
+      return;
+    }
+
+    setWarehouseFilter(normalizedWarehouse);
+  };
 
   return {
     isOpen,
@@ -125,5 +177,11 @@ export const useInventoryAuxiliarModal = () => {
     stockPrevious,
     isLoading,
     error,
+    selectedWarehouse,
+    selectedRowKey,
+    warehouseFilter,
+    selectWarehouse,
+    selectRow,
+    filterBySelectedWarehouse,
   };
 };

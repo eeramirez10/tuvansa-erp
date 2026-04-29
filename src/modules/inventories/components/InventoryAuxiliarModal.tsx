@@ -20,7 +20,20 @@ const COLUMNS = [
 ] as const;
 
 function InventoryAuxiliarModal() {
-  const { isOpen, close, stockPrevious, rows, currentCode, isLoading, error } = useInventoryAuxiliarModal();
+  const {
+    isOpen,
+    close,
+    stockPrevious,
+    rows,
+    currentCode,
+    isLoading,
+    error,
+    selectedWarehouse,
+    selectedRowKey,
+    warehouseFilter,
+    selectRow,
+    filterBySelectedWarehouse,
+  } = useInventoryAuxiliarModal();
 
   if (!isOpen) {
     return null;
@@ -77,7 +90,20 @@ function InventoryAuxiliarModal() {
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={`${row.date}-${row.document}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
+                <tr
+                  key={`${row.date}-${row.document}-${row.warehouse}-${row.user}`}
+                  className={`cursor-default ${
+                    selectedRowKey === `${row.date}-${row.document}-${row.warehouse}-${row.user}`
+                      ? "bg-[#cfe5ff]"
+                      : "bg-[#efefef] odd:bg-[#f4f4f4]"
+                  }`}
+                  onClick={() =>
+                    selectRow(
+                      `${row.date}-${row.document}-${row.warehouse}-${row.user}`,
+                      row.warehouse,
+                    )
+                  }
+                >
                   <td className="w-[96px] border border-[#a6adb5] px-1 py-[5px]">{formatLegacyDate(row.date)}</td>
                   <td className="w-[102px] border border-[#a6adb5] px-1 py-[5px] text-[#144d84]">{row.document}</td>
                   <td className="w-[36px] border border-[#a6adb5] px-1 py-[5px] text-center">{row.tm}</td>
@@ -108,9 +134,17 @@ function InventoryAuxiliarModal() {
         </div>
 
         <footer className="flex h-[42px] items-center gap-3 border-t border-[#a1a8af] bg-[#ececec] px-2">
-          <button type="button" className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px]">
+          <button
+            type="button"
+            onClick={filterBySelectedWarehouse}
+            disabled={!selectedWarehouse || !selectedRowKey}
+            className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px] disabled:opacity-60"
+          >
             Filtrar almacén
           </button>
+          <div className="text-[11px] text-[#4b5563]">
+            {warehouseFilter ? `Filtro: almacén ${warehouseFilter}` : "Sin filtro de almacén"}
+          </div>
           <button type="button" className="h-[30px] min-w-[130px] border border-[#9da3aa] bg-[#d8d8d8] px-3 text-[11px]">
             Filtrar T'S
           </button>

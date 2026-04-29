@@ -129,11 +129,26 @@ export const getInventoryWarehousesByCode = async (
 
 export const getInventoryAuxiliarByCode = async (
   code: string,
-  options?: RequestOptions,
+  options?: RequestOptions & { alm?: string; dest?: number; multicia?: number },
 ): Promise<InventoryAuxiliarResponse> => {
+  const searchParams = new URLSearchParams();
+  if (options?.alm?.trim()) {
+    searchParams.set("alm", options.alm.trim());
+  }
+  if (typeof options?.dest === "number" && Number.isFinite(options.dest)) {
+    searchParams.set("dest", String(Math.trunc(options.dest)));
+  }
+  if (typeof options?.multicia === "number" && Number.isFinite(options.multicia)) {
+    searchParams.set("multicia", String(Math.trunc(options.multicia)));
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/auxiliar?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/auxiliar`;
+
   return fetchJson<InventoryAuxiliarResponse>(
-    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/auxiliar`,
-    options,
+    url,
+    { signal: options?.signal },
   );
 };
 

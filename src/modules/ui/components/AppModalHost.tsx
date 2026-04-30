@@ -7,6 +7,7 @@ import InventoryCotizacionesClienteModal from "../../inventories/components/Inve
 import InventoryVentasClienteModal from "../../inventories/components/InventoryVentasClienteModal";
 import InventoryPedidosAsteriscoModal from "../../inventories/components/InventoryPedidosAsteriscoModal";
 import InventoryPedidosCtModal from "../../inventories/components/InventoryPedidosCtModal";
+import InventoryVentasDesglosadasModal from "../../inventories/components/InventoryVentasDesglosadasModal";
 
 function AppModalHost() {
   return (
@@ -20,6 +21,7 @@ function AppModalHost() {
       <InventoryVentasClienteModal />
       <InventoryPedidosAsteriscoModal />
       <InventoryPedidosCtModal />
+      <InventoryVentasDesglosadasModal />
     </>
   );
 }

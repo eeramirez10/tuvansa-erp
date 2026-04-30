@@ -8,6 +8,7 @@ export const MODAL_IDS = {
   INVENTORY_PEDIDOS_CLIENTE: "inventoryPedidosCliente",
   INVENTORY_COTIZACIONES_CLIENTE: "inventoryCotizacionesCliente",
   INVENTORY_VENTAS_CLIENTE: "inventoryVentasCliente",
+  INVENTORY_VENTAS_DESGLOSADAS: "inventoryVentasDesglosadas",
   INVENTORY_PEDIDOS_ASTERISCO: "inventoryPedidosAsterisco",
   INVENTORY_PEDIDOS_CT: "inventoryPedidosCt",
 } as const;

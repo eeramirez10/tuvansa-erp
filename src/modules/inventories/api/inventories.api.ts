@@ -3,6 +3,7 @@ import type {
   InventoryClientOrdersResponse,
   InventoryClientSalesResponse,
   InventoryDetailResponse,
+  InventorySalesBreakdownResponse,
   InventoryWarehousesResponse,
   InventoriesListResponse,
   InventoriesQueryParams,
@@ -169,5 +170,27 @@ export const getInventoryClientSalesByCode = async (
   return fetchJson<InventoryClientSalesResponse>(
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/sales-by-client`,
     options,
+  );
+};
+
+export const getInventorySalesBreakdownByCode = async (
+  code: string,
+  options?: RequestOptions & { dest?: number; multicia?: number },
+): Promise<InventorySalesBreakdownResponse> => {
+  const searchParams = new URLSearchParams();
+  if (typeof options?.dest === "number" && Number.isFinite(options.dest)) {
+    searchParams.set("dest", String(Math.trunc(options.dest)));
+  }
+  if (typeof options?.multicia === "number" && Number.isFinite(options.multicia)) {
+    searchParams.set("multicia", String(Math.trunc(options.multicia)));
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/sales-breakdown?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/sales-breakdown`;
+
+  return fetchJson<InventorySalesBreakdownResponse>(
+    url,
+    { signal: options?.signal },
   );
 };

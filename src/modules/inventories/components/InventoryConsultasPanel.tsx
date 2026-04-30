@@ -38,6 +38,7 @@ export const InventoryConsultasPanel = () => {
   const { open: openPedidosClienteModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CLIENTE);
   const { open: openCotizacionesClienteModal } = useModal(MODAL_IDS.INVENTORY_COTIZACIONES_CLIENTE);
   const { open: openVentasClienteModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_CLIENTE);
+  const { open: openVentasDesglosadasModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_DESGLOSADAS);
   const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
   const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
 
@@ -74,6 +75,8 @@ export const InventoryConsultasPanel = () => {
                   ? openAuxiliarModal
                   : item === "Cotizaciones por cliente"
                     ? openCotizacionesClienteModal
+                    : item === "Ventas desglosadas"
+                      ? openVentasDesglosadasModal
                     : undefined
               }
               className="h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] px-2 text-center text-[11px] leading-[22px] font-semibold text-[#3f464f]"

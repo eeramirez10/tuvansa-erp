@@ -369,6 +369,35 @@ export type InventoryClientSalesResponse = {
   };
 };
 
+export type InventorySalesBreakdownRow = {
+  code: string;
+  name: string;
+  quantity: number | null;
+  price: number | null;
+  document: string;
+  date: string | null;
+  unitPrice: number | null;
+  dollarExchangeRate: number | null;
+  discountPercent: number | null;
+  purchaseOrder: string;
+  branch: string;
+  pieces: number | null;
+};
+
+export type InventorySalesBreakdownResponse = {
+  data: InventorySalesBreakdownRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totalQuantity?: number;
+    totalPrice?: number;
+    destination?: number | null;
+    multiCompany?: number | null;
+  };
+};
+
 export type InventoriesQueryParams = {
   q?: string;
   searchBy?: "auto" | "code" | "description";

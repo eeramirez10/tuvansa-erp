@@ -1,0 +1,153 @@
+import { Square, X } from "lucide-react";
+import { formatFixed } from "../utils/formatFixed";
+import { formatLegacyDate } from "../utils/formatLegacyDate";
+import { useInventoryOrdenadoProveedoresModal } from "../hooks/useInventoryOrdenadoProveedoresModal";
+
+const COLUMNS = [
+  { key: "code", label: "Código", width: "w-[70px]" },
+  { key: "description", label: "Descripción", width: "w-[260px]" },
+  { key: "oc", label: "OC", width: "w-[64px]" },
+  { key: "branch", label: "Sucursal", width: "w-[64px]" },
+  { key: "um", label: "UM", width: "w-[40px]" },
+  { key: "ordered", label: "Pedido", width: "w-[72px]" },
+  { key: "supplied", label: "Surtido", width: "w-[72px]" },
+  { key: "remaining", label: "Resta", width: "w-[72px]" },
+  { key: "price", label: "Precio", width: "w-[74px]" },
+  { key: "providerOc", label: "OC Prv.", width: "w-[78px]" },
+  { key: "expectedDate", label: "Fecha E.", width: "w-[84px]" },
+  { key: "date", label: "Fecha", width: "w-[84px]" },
+  { key: "warehouse", label: "Alm", width: "w-[46px]" },
+  { key: "observations", label: "Obs....", width: "w-[220px]" },
+  { key: "confirmed", label: "Confirmado", width: "w-[80px]" },
+  { key: "expiresAt", label: "Vence", width: "w-[84px]" },
+  { key: "createdAt", label: "Alta", width: "w-[84px]" },
+  { key: "confirmedAt", label: "Confirmada", width: "w-[90px]" },
+] as const;
+
+function InventoryOrdenadoProveedoresModal() {
+  const { isOpen, close, currentCode, rows, summary, isLoading, error } = useInventoryOrdenadoProveedoresModal();
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+      <section className="flex h-[min(560px,78vh)] w-[min(1420px,98vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
+        <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
+          <div className="flex items-center gap-1">
+            <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
+            <h2 className="text-[12px] leading-none font-semibold text-[#1e293b]">Ordenado a proveedores</h2>
+          </div>
+          <div className="mr-auto ml-3 text-[11px] text-[#3a4552]">{currentCode ? `Producto: ${currentCode}` : ""}</div>
+          <div className="flex items-center gap-[6px]">
+            <button
+              type="button"
+              className="grid h-[18px] w-[18px] place-items-center border border-[#6d747b] bg-[#ededed] text-[#2c3948]"
+            >
+              <Square className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={close}
+              className="grid h-[18px] w-[18px] place-items-center border border-[#6d747b] bg-[#ededed] text-[#2c3948]"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </header>
+
+        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+          <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
+            <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
+              <tr>
+                {COLUMNS.map((column) => (
+                  <th
+                    key={column.key}
+                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, index) => (
+                <tr key={`${row.oc}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
+                  <td className="w-[70px] border border-[#a6adb5] px-1 py-[4px]">{row.code}</td>
+                  <td className="w-[260px] border border-[#a6adb5] px-1 py-[4px]">{row.description}</td>
+                  <td className="w-[64px] border border-[#a6adb5] px-1 py-[4px]">{row.oc}</td>
+                  <td className="w-[64px] border border-[#a6adb5] px-1 py-[4px] text-right">{row.branch}</td>
+                  <td className="w-[40px] border border-[#a6adb5] px-1 py-[4px]">{row.um}</td>
+                  <td className="w-[72px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatFixed(row.ordered, 0)}</td>
+                  <td className="w-[72px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatFixed(row.supplied, 0)}</td>
+                  <td className="w-[72px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatFixed(row.remaining, 0)}</td>
+                  <td className="w-[74px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatFixed(row.price, 2)}</td>
+                  <td className="w-[78px] border border-[#a6adb5] px-1 py-[4px]">{row.providerOc}</td>
+                  <td className="w-[84px] border border-[#a6adb5] px-1 py-[4px]">{formatLegacyDate(row.expectedDate)}</td>
+                  <td className="w-[84px] border border-[#a6adb5] px-1 py-[4px]">{formatLegacyDate(row.date)}</td>
+                  <td className="w-[46px] border border-[#a6adb5] px-1 py-[4px]">{row.warehouse}</td>
+                  <td className="w-[220px] border border-[#a6adb5] px-1 py-[4px]">{row.observations}</td>
+                  <td className="w-[80px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatFixed(row.confirmed, 0)}</td>
+                  <td className="w-[84px] border border-[#a6adb5] px-1 py-[4px]">{formatLegacyDate(row.expiresAt)}</td>
+                  <td className="w-[84px] border border-[#a6adb5] px-1 py-[4px]">{formatLegacyDate(row.createdAt)}</td>
+                  <td className="w-[90px] border border-[#a6adb5] px-1 py-[4px]">{formatLegacyDate(row.confirmedAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {isLoading ? (
+            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
+              Cargando ordenado a proveedores...
+            </div>
+          ) : null}
+          {error ? (
+            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
+              {error}
+            </div>
+          ) : null}
+        </div>
+
+        <footer className="flex items-center justify-between gap-4 border-t border-[#a1a8af] bg-[#ececec] px-2 py-1">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="h-[26px] min-w-[148px] border border-[#1c6fb4] bg-[#d8d8d8] px-2 text-[11px] text-[#1f2d3d]"
+            >
+              Filtrar pedidos surtidos
+            </button>
+            <button
+              type="button"
+              className="h-[26px] min-w-[88px] border border-[#9ca2a9] bg-[#d8d8d8] px-2 text-[11px] text-[#1f2d3d]"
+            >
+              Coment
+            </button>
+          </div>
+
+          <div className="flex items-end gap-3 text-[11px]">
+            <div className="flex flex-col items-end">
+              <span>Stock</span>
+              <span className="inline-flex h-[20px] w-[86px] items-center justify-end border border-[#a0a6ad] bg-[#d8d8d8] px-1">
+                {formatFixed(summary.stock, 3)}
+              </span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span>Por llegar</span>
+              <span className="inline-flex h-[20px] w-[86px] items-center justify-end border border-[#a0a6ad] bg-[#d8d8d8] px-1">
+                {formatFixed(summary.pending, 3)}
+              </span>
+            </div>
+            <div className="flex flex-col items-end">
+              <span>Total</span>
+              <span className="inline-flex h-[20px] w-[86px] items-center justify-end border border-[#a0a6ad] bg-[#d8d8d8] px-1">
+                {formatFixed(summary.total, 3)}
+              </span>
+            </div>
+          </div>
+        </footer>
+      </section>
+    </div>
+  );
+}
+
+export default InventoryOrdenadoProveedoresModal;

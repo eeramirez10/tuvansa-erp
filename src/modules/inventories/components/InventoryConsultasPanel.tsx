@@ -38,6 +38,14 @@ export const InventoryConsultasPanel = () => {
   const { open: openPedidosClienteModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CLIENTE);
   const { open: openCotizacionesClienteModal } = useModal(MODAL_IDS.INVENTORY_COTIZACIONES_CLIENTE);
   const { open: openVentasClienteModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_CLIENTE);
+  const { open: openVentasSucursalModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_SUCURSAL);
+  const { open: openVentasAnualesModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_ANUALES);
+  const { open: openVentasAnualesResumenModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_ANUALES_RESUMEN);
+  const { open: openOrdenadoProveedoresModal } = useModal(MODAL_IDS.INVENTORY_ORDENADO_PROVEEDORES);
+  const { open: openComprasProveedorModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_PROVEEDOR);
+  const { open: openComprasDesglosadasModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_DESGLOSADAS);
+  const { open: openComprasAnualesModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_ANUALES);
+  const { open: openComprasAnualesResumenModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_ANUALES_RESUMEN);
   const { open: openVentasDesglosadasModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_DESGLOSADAS);
   const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
   const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
@@ -75,6 +83,22 @@ export const InventoryConsultasPanel = () => {
                   ? openAuxiliarModal
                   : item === "Cotizaciones por cliente"
                     ? openCotizacionesClienteModal
+                    : item === "Ventas por sucursal"
+                      ? openVentasSucursalModal
+                    : item === "Ventas anuales"
+                      ? openVentasAnualesModal
+                    : item === "Ventas anuales resumen"
+                      ? openVentasAnualesResumenModal
+                    : item === "Ordenado a proveedores  CT"
+                      ? openOrdenadoProveedoresModal
+                    : item === "Compras por proveedor  DT"
+                      ? openComprasProveedorModal
+                    : item === "Compras desglosadas"
+                      ? openComprasDesglosadasModal
+                    : item === "Compras anuales"
+                      ? openComprasAnualesModal
+                    : item === "Compras anuales resumen"
+                      ? openComprasAnualesResumenModal
                     : item === "Ventas desglosadas"
                       ? openVentasDesglosadasModal
                     : undefined

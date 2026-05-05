@@ -7,9 +7,13 @@ import { LegacyActionPanel } from "../../shared/components/legacy-actions/Legacy
 export const  InventoryActionsPanel = () => {
   const { open: openWarehousesModal } = useModal(MODAL_IDS.INVENTORY_WAREHOUSES);
   const { open: openOthersModal } = useModal(MODAL_IDS.INVENTORY_OTHERS);
+  const { open: openClasificarModal } = useModal(MODAL_IDS.INVENTORY_CLASIFICAR);
+  const { open: openDescrExtModal } = useModal(MODAL_IDS.INVENTORY_DESCR_EXT);
 
   const actionsHandlers: Partial<Record<string, () => void>> = {
     almacenes: openWarehousesModal,
+    clasificar: openClasificarModal,
+    descrExt: openDescrExtModal,
     otros: openOthersModal,
   }
 

@@ -1,8 +1,15 @@
 import type {
+  InventoryAnnualPurchasesResponse,
+  InventoryAnnualSalesResponse,
   InventoryAuxiliarResponse,
+  InventoryBranchSalesResponse,
+  InventoryClassificationResponse,
   InventoryClientOrdersResponse,
   InventoryClientSalesResponse,
   InventoryDetailResponse,
+  InventoryOrderedSuppliersResponse,
+  InventoryPurchasesBreakdownResponse,
+  InventoryPurchasesBySupplierResponse,
   InventorySalesBreakdownResponse,
   InventoryWarehousesResponse,
   InventoriesListResponse,
@@ -192,5 +199,88 @@ export const getInventorySalesBreakdownByCode = async (
   return fetchJson<InventorySalesBreakdownResponse>(
     url,
     { signal: options?.signal },
+  );
+};
+
+export const getInventorySalesByBranchByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryBranchSalesResponse> => {
+  return fetchJson<InventoryBranchSalesResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/sales-by-branch`,
+    options,
+  );
+};
+
+export const getInventoryAnnualSalesByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryAnnualSalesResponse> => {
+  return fetchJson<InventoryAnnualSalesResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/annual-sales`,
+    options,
+  );
+};
+
+export const getInventoryPurchasesBySupplierByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryPurchasesBySupplierResponse> => {
+  return fetchJson<InventoryPurchasesBySupplierResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/purchases-by-supplier`,
+    options,
+  );
+};
+
+export const getInventoryPurchasesBreakdownByCode = async (
+  code: string,
+  options?: RequestOptions & { dest?: number; multicia?: number },
+): Promise<InventoryPurchasesBreakdownResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (typeof options?.dest === "number" && Number.isFinite(options.dest)) {
+    searchParams.set("dest", String(Math.trunc(options.dest)));
+  }
+  if (typeof options?.multicia === "number" && Number.isFinite(options.multicia)) {
+    searchParams.set("multicia", String(Math.trunc(options.multicia)));
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/purchases-breakdown?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/purchases-breakdown`;
+
+  return fetchJson<InventoryPurchasesBreakdownResponse>(
+    url,
+    { signal: options?.signal },
+  );
+};
+
+export const getInventoryOrderedSuppliersByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryOrderedSuppliersResponse> => {
+  return fetchJson<InventoryOrderedSuppliersResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/ordered-suppliers`,
+    options,
+  );
+};
+
+export const getInventoryAnnualPurchasesByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryAnnualPurchasesResponse> => {
+  return fetchJson<InventoryAnnualPurchasesResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/annual-purchases`,
+    options,
+  );
+};
+
+export const getInventoryClassificationByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryClassificationResponse> => {
+  return fetchJson<InventoryClassificationResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/classification`,
+    options,
   );
 };

@@ -11,6 +11,7 @@ export type InventoryListItem = {
 export type InventoryIdentity = {
   code: string;
   description: string;
+  extendedDescription: string;
   unitCode: string;
   unitDescription: string | null;
   family: string;
@@ -31,6 +32,25 @@ export type InventoryPricing = {
   currency2: number | null;
   currency3: number | null;
   adValorem: number | null;
+};
+
+export type InventoryClassification = {
+  supplier: string;
+  product: string;
+  type: string;
+  material: string;
+  ends: string;
+  pressureClass: string;
+  cedula: string;
+  measure: string;
+  others: string;
+  origin: string;
+  sativ: string;
+  coating: string;
+  branch: string;
+  brand: string;
+  inv: string;
+  family: string;
 };
 
 export type InventoryAccumulators = {
@@ -218,6 +238,7 @@ export type InventoryIndicators = {
 export type InventoryDetail = {
   identity: InventoryIdentity;
   pricing: InventoryPricing;
+  classification: InventoryClassification;
   accumulators: InventoryAccumulators;
   storage: InventoryStorage;
   dimensions: InventoryDimensions;
@@ -395,6 +416,235 @@ export type InventorySalesBreakdownResponse = {
     totalPrice?: number;
     destination?: number | null;
     multiCompany?: number | null;
+  };
+};
+
+export type InventoryBranchSaleRow = {
+  branch: string;
+  code: string;
+  client: string;
+  quantity: number | null;
+  amount: number | null;
+};
+
+export type InventoryBranchSalesResponse = {
+  data: InventoryBranchSaleRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totalQuantity?: number;
+    totalAmount?: number;
+  };
+};
+
+export type InventoryAnnualSaleRow = {
+  code: string;
+  client: string;
+  year: number | null;
+  ene: number | null;
+  feb: number | null;
+  mar: number | null;
+  abr: number | null;
+  may: number | null;
+  jun: number | null;
+  jul: number | null;
+  ago: number | null;
+  sep: number | null;
+  oct: number | null;
+  nov: number | null;
+  dic: number | null;
+  total: number | null;
+};
+
+export type InventoryAnnualSalesResponse = {
+  data: InventoryAnnualSaleRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totals?: {
+      ene?: number | null;
+      feb?: number | null;
+      mar?: number | null;
+      abr?: number | null;
+      may?: number | null;
+      jun?: number | null;
+      jul?: number | null;
+      ago?: number | null;
+      sep?: number | null;
+      oct?: number | null;
+      nov?: number | null;
+      dic?: number | null;
+      total?: number | null;
+    };
+  };
+};
+
+export type InventoryPurchaseBySupplierRow = {
+  code: string;
+  supplier: string;
+  quantity: number | null;
+  amount: number | null;
+};
+
+export type InventoryPurchasesBySupplierResponse = {
+  data: InventoryPurchaseBySupplierRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totalQuantity?: number;
+    totalAmount?: number;
+  };
+};
+
+export type InventoryPurchaseBreakdownRow = {
+  code: string;
+  supplier: string;
+  quantity: number | null;
+  price: number | null;
+  document: string;
+  date: string | null;
+  pieces: number | null;
+  dollarExchangeRate: number | null;
+  amountDollars: number | null;
+};
+
+export type InventoryPurchasesBreakdownResponse = {
+  data: InventoryPurchaseBreakdownRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    destination?: number | null;
+    multiCompany?: number | null;
+  };
+};
+
+export type InventoryOrderedSupplierRow = {
+  code: string;
+  description: string;
+  oc: string;
+  branch: string;
+  um: string;
+  ordered: number | null;
+  supplied: number | null;
+  remaining: number | null;
+  price: number | null;
+  providerOc: string;
+  expectedDate: string | null;
+  date: string | null;
+  warehouse: string;
+  observations: string;
+  confirmed: number | null;
+  expiresAt: string | null;
+  createdAt: string | null;
+  confirmedAt: string | null;
+};
+
+export type InventoryOrderedSuppliersResponse = {
+  data: InventoryOrderedSupplierRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    stock?: number | null;
+    pending?: number | null;
+    total?: number | null;
+  };
+};
+
+export type InventoryAnnualPurchaseRow = {
+  code: string;
+  supplier: string;
+  year: number | null;
+  ene: number | null;
+  feb: number | null;
+  mar: number | null;
+  abr: number | null;
+  may: number | null;
+  jun: number | null;
+  jul: number | null;
+  ago: number | null;
+  sep: number | null;
+  oct: number | null;
+  nov: number | null;
+  dic: number | null;
+  total: number | null;
+};
+
+export type InventoryAnnualPurchasesResponse = {
+  data: InventoryAnnualPurchaseRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    totals?: {
+      ene?: number | null;
+      feb?: number | null;
+      mar?: number | null;
+      abr?: number | null;
+      may?: number | null;
+      jun?: number | null;
+      jul?: number | null;
+      ago?: number | null;
+      sep?: number | null;
+      oct?: number | null;
+      nov?: number | null;
+      dic?: number | null;
+      total?: number | null;
+    };
+  };
+};
+
+export type InventoryClassificationSelectedSlot = {
+  code: string;
+  description: string;
+};
+
+export type InventoryClassificationSelected = {
+  supplier: InventoryClassificationSelectedSlot;
+  product: InventoryClassificationSelectedSlot;
+  type: InventoryClassificationSelectedSlot;
+  material: InventoryClassificationSelectedSlot;
+  ends: InventoryClassificationSelectedSlot;
+  pressureClass: InventoryClassificationSelectedSlot;
+  cedula: InventoryClassificationSelectedSlot;
+  measure: InventoryClassificationSelectedSlot;
+  others: InventoryClassificationSelectedSlot;
+  origin: InventoryClassificationSelectedSlot;
+  sativ: InventoryClassificationSelectedSlot;
+  coating: InventoryClassificationSelectedSlot;
+  branch: InventoryClassificationSelectedSlot;
+  brand: InventoryClassificationSelectedSlot;
+  inv: InventoryClassificationSelectedSlot;
+  family: InventoryClassificationSelectedSlot;
+};
+
+export type InventoryClassificationOption = {
+  slot: string;
+  family: string;
+  description: string;
+  parent: string;
+  order: number;
+};
+
+export type InventoryClassificationResponse = {
+  data: {
+    selected: InventoryClassificationSelected | null;
+    options: InventoryClassificationOption[];
+  };
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
   };
 };
 

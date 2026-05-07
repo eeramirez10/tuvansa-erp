@@ -344,6 +344,69 @@ export type InventoryAuxiliarResponse = {
   };
 };
 
+export type InventoryLoteMovementRow = {
+  sequence: number | null;
+  date: string | null;
+  document: string;
+  entries: number | null;
+  exits: number | null;
+  warehouse: string;
+};
+
+export type InventoryLoteRow = {
+  sequence: number | null;
+  date: string | null;
+  expirationAt: string | null;
+  pedimento: string;
+  customsOffice: string;
+  lot: string;
+  available: number | null;
+  warehouse: string;
+  location: string;
+  cost: number | null;
+  adValorem: number | null;
+  movements: InventoryLoteMovementRow[];
+};
+
+export type InventoryLotesResponse = {
+  data: InventoryLoteRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+  };
+};
+
+export type InventoryUepsPepsRow = {
+  initial: number | null;
+  quantity: number | null;
+  cost: number | null;
+  adValorem: number | null;
+  date: string | null;
+  document: string;
+  lot: string;
+  expirationAt: string | null;
+  key: string;
+  keySuffix: string;
+  warehouse: string;
+  provider: string;
+  exchangeRate: number | null;
+  costDollars: number | null;
+  adValoremDollars: number | null;
+  total: number | null;
+};
+
+export type InventoryUepsPepsResponse = {
+  data: InventoryUepsPepsRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+  };
+};
+
 export type InventoryClientOrderRow = {
   code: string;
   description: string;

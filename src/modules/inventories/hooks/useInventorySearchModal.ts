@@ -119,7 +119,7 @@ export const useInventorySearchModal = (): UseInventorySearchModalReturn => {
   };
 
   const handleCodeInputTab = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== "Tab" || event.shiftKey) {
+    if ((event.key !== "Tab" && event.key !== 'Enter') || event.shiftKey) {
       return;
     }
 

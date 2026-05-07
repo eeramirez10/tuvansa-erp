@@ -9,12 +9,36 @@ export const  InventoryActionsPanel = () => {
   const { open: openOthersModal } = useModal(MODAL_IDS.INVENTORY_OTHERS);
   const { open: openClasificarModal } = useModal(MODAL_IDS.INVENTORY_CLASIFICAR);
   const { open: openDescrExtModal } = useModal(MODAL_IDS.INVENTORY_DESCR_EXT);
+  const { open: openLotesModal } = useModal(MODAL_IDS.INVENTORY_LOTES);
+  const { open: openUepsPepsModal } = useModal(MODAL_IDS.INVENTORY_UEPS_PEPS);
+  const { open: openAltaCtModal } = useModal(MODAL_IDS.INVENTORY_ALTA_CT);
+  const { open: openBloquearModal } = useModal(MODAL_IDS.INVENTORY_BLOQUEAR);
+  const { open: openCanalesModal } = useModal(MODAL_IDS.INVENTORY_CANALES);
+  const { open: openDescuentosClientesModal } = useModal(MODAL_IDS.INVENTORY_DESCUENTOS_CLIENTES);
+  const { open: openDescuentosProveedoresModal } = useModal(MODAL_IDS.INVENTORY_DESCUENTOS_PROVEEDORES);
+  const { open: openEspecificacionesModal } = useModal(MODAL_IDS.INVENTORY_ESPECIFICACIONES);
+  const { open: openInvCtModal } = useModal(MODAL_IDS.INVENTORY_INV_CT);
+  const { open: openPreciosModal } = useModal(MODAL_IDS.INVENTORY_PRECIOS);
+  const { open: openPrepacksModal } = useModal(MODAL_IDS.INVENTORY_PREPACKS);
+  const { open: openSkusModal } = useModal(MODAL_IDS.INVENTORY_SKUS);
 
   const actionsHandlers: Partial<Record<string, () => void>> = {
     almacenes: openWarehousesModal,
     clasificar: openClasificarModal,
     descrExt: openDescrExtModal,
     otros: openOthersModal,
+    lotes: openLotesModal,
+    uepsPeps: openUepsPepsModal,
+    altaCt: openAltaCtModal,
+    bloquear: openBloquearModal,
+    canales: openCanalesModal,
+    descuentosClientes: openDescuentosClientesModal,
+    descuentosProveedores: openDescuentosProveedoresModal,
+    especificaciones: openEspecificacionesModal,
+    invCt: openInvCtModal,
+    precios: openPreciosModal,
+    prepacks: openPrepacksModal,
+    skus: openSkusModal,
   }
 
   const items = inventoryActionItems

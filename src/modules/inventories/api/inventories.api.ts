@@ -7,6 +7,8 @@ import type {
   InventoryClientOrdersResponse,
   InventoryClientSalesResponse,
   InventoryDetailResponse,
+  InventoryLotesResponse,
+  InventoryUepsPepsResponse,
   InventoryOrderedSuppliersResponse,
   InventoryPurchasesBreakdownResponse,
   InventoryPurchasesBySupplierResponse,
@@ -35,25 +37,131 @@ type ApiError = {
 
 type RequestOptions = {
   signal?: AbortSignal;
+  timeoutMs?: number;
+  retries?: number;
+  retryDelayMs?: number;
+};
+
+const DEFAULT_FETCH_TIMEOUT_MS = 15000;
+const DEFAULT_FETCH_RETRIES = 1;
+const DEFAULT_FETCH_RETRY_DELAY_MS = 250;
+
+const sleep = async (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+
+const isAbortError = (error: unknown): boolean =>
+  error instanceof DOMException && error.name === "AbortError";
+
+const withTimeoutSignal = (
+  signal: AbortSignal | undefined,
+  timeoutMs: number,
+): {
+  signal: AbortSignal;
+  cleanup: () => void;
+  didTimeout: () => boolean;
+} => {
+  const controller = new AbortController();
+  let timeoutTriggered = false;
+
+  const timeoutId = window.setTimeout(() => {
+    timeoutTriggered = true;
+    controller.abort();
+  }, timeoutMs);
+
+  const onAbort = (): void => {
+    controller.abort();
+  };
+
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort();
+    } else {
+      signal.addEventListener("abort", onAbort, { once: true });
+    }
+  }
+
+  return {
+    signal: controller.signal,
+    cleanup: () => {
+      window.clearTimeout(timeoutId);
+      if (signal) {
+        signal.removeEventListener("abort", onAbort);
+      }
+    },
+    didTimeout: () => timeoutTriggered,
+  };
+};
+
+const shouldRetryFetchError = (error: unknown): boolean => {
+  if (isAbortError(error)) {
+    return true;
+  }
+  return error instanceof TypeError;
+};
+
+const requestJson = async <T>(
+  url: string,
+  options?: RequestOptions,
+  allow404 = false,
+): Promise<T | null> => {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
+  const retries = options?.retries ?? DEFAULT_FETCH_RETRIES;
+  const retryDelayMs = options?.retryDelayMs ?? DEFAULT_FETCH_RETRY_DELAY_MS;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const timer = withTimeoutSignal(options?.signal, timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        signal: timer.signal,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (allow404 && response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        const payload = (await response
+          .json()
+          .catch(() => ({ error: { message: "Unknown API error" } }))) as ApiError;
+
+        throw new Error(payload.error?.message ?? `Request failed with status ${response.status}`);
+      }
+
+      return (await response.json()) as T;
+    } catch (error) {
+      if (options?.signal?.aborted) {
+        throw new Error("Request canceled");
+      }
+
+      const timeoutError = isAbortError(error) && timer.didTimeout();
+      const canRetry = shouldRetryFetchError(error) || timeoutError;
+      const isLastAttempt = attempt >= retries;
+
+      if (isLastAttempt || !canRetry) {
+        if (timeoutError) {
+          throw new Error("Request timeout");
+        }
+        throw error;
+      }
+
+      await sleep(retryDelayMs);
+    } finally {
+      timer.cleanup();
+    }
+  }
+
+  return null;
 };
 
 const fetchJson = async <T>(url: string, options?: RequestOptions): Promise<T> => {
-  const response = await fetch(url, {
-    signal: options?.signal,
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    const payload = (await response
-      .json()
-      .catch(() => ({ error: { message: "Unknown API error" } }))) as ApiError;
-
-    throw new Error(payload.error?.message ?? `Request failed with status ${response.status}`);
-  }
-
-  return (await response.json()) as T;
+  const payload = await requestJson<T>(url, options, false);
+  return payload as T;
 };
 
 export const getInventories = async (
@@ -89,41 +197,27 @@ export const getInventoryByCode = async (code: string): Promise<InventoryDetailR
   return fetchJson<InventoryDetailResponse>(`${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}`);
 };
 
-const fetchOptionalJson = async <T>(url: string): Promise<T | null> => {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (response.status === 404) {
-    return null;
-  }
-
-  if (!response.ok) {
-    const payload = (await response
-      .json()
-      .catch(() => ({ error: { message: "Unknown API error" } }))) as ApiError;
-
-    throw new Error(payload.error?.message ?? `Request failed with status ${response.status}`);
-  }
-
-  return (await response.json()) as T;
+const fetchOptionalJson = async <T>(url: string, options?: RequestOptions): Promise<T | null> => {
+  return requestJson<T>(url, options, true);
 };
 
 export const getNextInventoryByCode = async (
   code: string,
+  options?: RequestOptions,
 ): Promise<InventoryDetailResponse | null> => {
   return fetchOptionalJson<InventoryDetailResponse>(
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/next`,
+    options,
   );
 };
 
 export const getPreviousInventoryByCode = async (
   code: string,
+  options?: RequestOptions,
 ): Promise<InventoryDetailResponse | null> => {
   return fetchOptionalJson<InventoryDetailResponse>(
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/previous`,
+    options,
   );
 };
 
@@ -157,6 +251,26 @@ export const getInventoryAuxiliarByCode = async (
   return fetchJson<InventoryAuxiliarResponse>(
     url,
     { signal: options?.signal },
+  );
+};
+
+export const getInventoryLotesByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryLotesResponse> => {
+  return fetchJson<InventoryLotesResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/lotes`,
+    options,
+  );
+};
+
+export const getInventoryUepsPepsByCode = async (
+  code: string,
+  options?: RequestOptions,
+): Promise<InventoryUepsPepsResponse> => {
+  return fetchJson<InventoryUepsPepsResponse>(
+    `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/ueps-peps`,
+    options,
   );
 };
 

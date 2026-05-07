@@ -6,6 +6,8 @@ export const MODAL_IDS = {
   INVENTORY_OTHERS: "inventoryOthers",
   INVENTORY_CLASIFICAR: "inventoryClasificar",
   INVENTORY_DESCR_EXT: "inventoryDescrExt",
+  INVENTORY_LOTES: "inventoryLotes",
+  INVENTORY_UEPS_PEPS: "inventoryUepsPeps",
   INVENTORY_AUXILIAR: "inventoryAuxiliar",
   INVENTORY_PEDIDOS_CLIENTE: "inventoryPedidosCliente",
   INVENTORY_COTIZACIONES_CLIENTE: "inventoryCotizacionesCliente",
@@ -21,6 +23,16 @@ export const MODAL_IDS = {
   INVENTORY_VENTAS_DESGLOSADAS: "inventoryVentasDesglosadas",
   INVENTORY_PEDIDOS_ASTERISCO: "inventoryPedidosAsterisco",
   INVENTORY_PEDIDOS_CT: "inventoryPedidosCt",
+  INVENTORY_ALTA_CT: "inventoryAltaCt",
+  INVENTORY_BLOQUEAR: "inventoryBloquear",
+  INVENTORY_CANALES: "inventoryCanales",
+  INVENTORY_DESCUENTOS_CLIENTES: "inventoryDescuentosClientes",
+  INVENTORY_DESCUENTOS_PROVEEDORES: "inventoryDescuentosProveedores",
+  INVENTORY_ESPECIFICACIONES: "inventoryEspecificaciones",
+  INVENTORY_INV_CT: "inventoryInvCt",
+  INVENTORY_PRECIOS: "inventoryPrecios",
+  INVENTORY_PREPACKS: "inventoryPrepacks",
+  INVENTORY_SKUS: "inventorySkus",
 } as const;
 
 export type ModalId = (typeof MODAL_IDS)[keyof typeof MODAL_IDS];

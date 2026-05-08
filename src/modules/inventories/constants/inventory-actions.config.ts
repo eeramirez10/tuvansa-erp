@@ -14,7 +14,7 @@ export const inventoryActionItems: LegacyActionItem[] = [
   { id: "skus", label: "SKUs", section: "top", pendingBackend: true },
   { id: "prepacks", label: "Prepacks", section: "top", pendingBackend: true },
   { id: "canales", label: "Canales", section: "top", pendingBackend: true },
-  { id: "precios", label: "Precios", section: "top", pendingBackend: true },
+  { id: "precios", label: "Precios", section: "top" },
 
   { id: "comprasProd", label: "Compras/Prod", section: "bottom", emphasize: true },
   { id: "alternos", label: "Alternos", section: "bottom", pendingBackend: true },

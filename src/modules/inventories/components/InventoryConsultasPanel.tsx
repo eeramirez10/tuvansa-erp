@@ -13,6 +13,43 @@ type TripleConsultaButtonProps = {
   pendingCt?: boolean;
 };
 
+type DoubleConsultaButtonProps = {
+  leftLabel: string;
+  rightLabel: string;
+  onLeftClick?: () => void;
+  onRightClick?: () => void;
+  pendingLeft?: boolean;
+  pendingRight?: boolean;
+};
+
+function DoubleConsultaButton({
+  leftLabel,
+  rightLabel,
+  onLeftClick,
+  onRightClick,
+  pendingLeft = false,
+  pendingRight = false,
+}: DoubleConsultaButtonProps) {
+  return (
+    <div className="flex h-[24px]">
+      <button
+        type="button"
+        onClick={onLeftClick}
+        className={["h-full flex-1", legacyButtonClass, pendingLeft ? legacyPendingButtonClass : ""].join(" ")}
+      >
+        {leftLabel}
+      </button>
+      <button
+        type="button"
+        onClick={onRightClick}
+        className={["h-full flex-1", legacyButtonClass, pendingRight ? legacyPendingButtonClass : ""].join(" ")}
+      >
+        {rightLabel}
+      </button>
+    </div>
+  );
+}
+
 function TripleConsultaButton({
   label,
   onMainClick,
@@ -63,6 +100,15 @@ export const InventoryConsultasPanel = () => {
   const { open: openComprasAnualesModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_ANUALES);
   const { open: openComprasAnualesResumenModal } = useModal(MODAL_IDS.INVENTORY_COMPRAS_ANUALES_RESUMEN);
   const { open: openVentasDesglosadasModal } = useModal(MODAL_IDS.INVENTORY_VENTAS_DESGLOSADAS);
+  const { open: openCotizadoProveedoresModal } = useModal(MODAL_IDS.INVENTORY_COTIZADO_PROVEEDORES);
+  const { open: openBonificacionesModal } = useModal(MODAL_IDS.INVENTORY_BONIFICACIONES);
+  const { open: openWipModal } = useModal(MODAL_IDS.INVENTORY_WIP);
+  const { open: openPiezasSurtidasModal } = useModal(MODAL_IDS.INVENTORY_PIEZAS_SURTIDAS);
+  const { open: openPiezasModal } = useModal(MODAL_IDS.INVENTORY_PIEZAS);
+  const { open: openHabilitacionesPendientesModal } = useModal(MODAL_IDS.INVENTORY_HABILITACIONES_PENDIENTES);
+  const { open: openDocumentosModal } = useModal(MODAL_IDS.INVENTORY_DOCUMENTOS);
+  const { open: openCurvaTmpModal } = useModal(MODAL_IDS.INVENTORY_CURVA_TMP);
+  const { open: openCurva2Modal } = useModal(MODAL_IDS.INVENTORY_CURVA_2);
   const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
   const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
 
@@ -78,9 +124,25 @@ export const InventoryConsultasPanel = () => {
     if (item === "Compras anuales") return openComprasAnualesModal;
     if (item === "Compras anuales resumen") return openComprasAnualesResumenModal;
     if (item === "Ventas desglosadas") return openVentasDesglosadasModal;
+    if (item === "Cotizado a proveedores  CT") return openCotizadoProveedoresModal;
+    if (item === "Piezas") return openPiezasModal;
+    if (item === "Piezas surtidas") return openPiezasSurtidasModal;
+    if (item === "WIP                   CT") return openWipModal;
+    if (item === "Habilitaciones pendientes") return openHabilitacionesPendientesModal;
+    if (item === "Documentos") return openDocumentosModal;
+    if (item === "Bonificaciones") return openBonificacionesModal;
 
     return undefined;
   };
+
+  const pendingModalOnlyItems = new Set([
+    "Piezas",
+    "Piezas surtidas",
+    "WIP                   CT",
+    "Habilitaciones pendientes",
+    "Documentos",
+    "Bonificaciones",
+  ]);
 
   return (
     <aside className="border border-[#9ca4ac] bg-[#d7d7d7]">
@@ -115,8 +177,22 @@ export const InventoryConsultasPanel = () => {
             );
           }
 
+          if (item === "Curva Tmp.      Curva 2") {
+            return (
+              <DoubleConsultaButton
+                key={`${item}-${idx}`}
+                leftLabel="Curva Tmp."
+                rightLabel="Curva 2"
+                onLeftClick={openCurvaTmpModal}
+                onRightClick={openCurva2Modal}
+                pendingLeft
+                pendingRight
+              />
+            );
+          }
+
           const onClick = getConsultaHandler(item);
-          const isPending = !onClick;
+          const isPending = !onClick || pendingModalOnlyItems.has(item);
 
           return (
             <button

@@ -623,6 +623,34 @@ export type InventoryOrderedSuppliersResponse = {
   };
 };
 
+export type InventoryQuotedSupplierRow = {
+  code: string;
+  description: string;
+  oc: string;
+  um: string;
+  ordered: number | null;
+  supplied: number | null;
+  remaining: number | null;
+  date: string | null;
+  expectedDate: string | null;
+  observations: string;
+  date2: string | null;
+};
+
+export type InventoryQuotedSuppliersResponse = {
+  data: InventoryQuotedSupplierRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+    stock?: number | null;
+    pending?: number | null;
+    total?: number | null;
+    pendingOnly?: boolean;
+  };
+};
+
 export type InventoryAnnualPurchaseRow = {
   code: string;
   supplier: string;

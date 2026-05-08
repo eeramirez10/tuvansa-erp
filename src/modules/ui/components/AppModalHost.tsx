@@ -35,6 +35,17 @@ import InventoryComponentesModal from "../../inventories/components/InventoryCom
 import InventoryEspecificCalModal from "../../inventories/components/InventoryEspecificCalModal";
 import InventoryImplosionModal from "../../inventories/components/InventoryImplosionModal";
 import InventoryCaracteristicasModal from "../../inventories/components/InventoryCaracteristicasModal";
+import InventoryCotizadoProveedoresModal from "../../inventories/components/InventoryCotizadoProveedoresModal";
+import {
+  InventoryBonificacionesModal,
+  InventoryCurva2Modal,
+  InventoryCurvaTmpModal,
+  InventoryDocumentosModal,
+  InventoryHabilitacionesPendientesModal,
+  InventoryPiezasModal,
+  InventoryPiezasSurtidasModal,
+  InventoryWipModal,
+} from "../../inventories/components/InventoryStaticConsultaModals";
 
 function AppModalHost() {
   return (
@@ -76,6 +87,15 @@ function AppModalHost() {
       <InventoryEspecificCalModal />
       <InventoryImplosionModal />
       <InventoryCaracteristicasModal />
+      <InventoryCotizadoProveedoresModal />
+      <InventoryBonificacionesModal />
+      <InventoryWipModal />
+      <InventoryPiezasSurtidasModal />
+      <InventoryPiezasModal />
+      <InventoryHabilitacionesPendientesModal />
+      <InventoryDocumentosModal />
+      <InventoryCurvaTmpModal />
+      <InventoryCurva2Modal />
     </>
   );
 }

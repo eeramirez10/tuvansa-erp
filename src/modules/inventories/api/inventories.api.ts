@@ -8,6 +8,7 @@ import type {
   InventoryClientSalesResponse,
   InventoryDetailResponse,
   InventoryLotesResponse,
+  InventoryQuotedSuppliersResponse,
   InventoryUepsPepsResponse,
   InventoryOrderedSuppliersResponse,
   InventoryPurchasesBreakdownResponse,
@@ -377,6 +378,23 @@ export const getInventoryOrderedSuppliersByCode = async (
     `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/ordered-suppliers`,
     options,
   );
+};
+
+export const getInventoryQuotedSuppliersByCode = async (
+  code: string,
+  options?: RequestOptions & { pending?: boolean },
+): Promise<InventoryQuotedSuppliersResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (typeof options?.pending === "boolean") {
+    searchParams.set("pending", options.pending ? "1" : "0");
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/quoted-suppliers?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/quoted-suppliers`;
+
+  return fetchJson<InventoryQuotedSuppliersResponse>(url, { signal: options?.signal });
 };
 
 export const getInventoryAnnualPurchasesByCode = async (

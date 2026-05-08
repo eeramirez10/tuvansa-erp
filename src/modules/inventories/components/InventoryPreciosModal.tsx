@@ -1,12 +1,11 @@
 import { X } from "lucide-react";
 import { LegacyInput } from "../../shared/components/legacy-form/LegacyInput";
-import { useModal } from "../../ui/hooks/useModal";
-import { MODAL_IDS } from "../../ui/store/modal.store";
-
-const PRICE_ROWS = [1, 2, 3, 6, 7, 8, 9, 10, 11, 12, 13];
+import { formatFixed } from "../utils/formatFixed";
+import { formatInteger } from "../utils/formatInteger";
+import { useInventoryPreciosModal } from "../hooks/useInventoryPreciosModal";
 
 function InventoryPreciosModal() {
-  const { isOpen, close } = useModal(MODAL_IDS.INVENTORY_PRECIOS);
+  const { isOpen, close, rows, cost, decimals, planPos, priceLevel, currentCode } = useInventoryPreciosModal();
 
   if (!isOpen) {
     return null;
@@ -20,6 +19,7 @@ function InventoryPreciosModal() {
             <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
             <span className="text-[12px] leading-none font-semibold text-[#1f2933]">Precios</span>
           </div>
+          <span className="mr-auto ml-3 text-[11px] text-[#3a4552]">{currentCode ? `Producto: ${currentCode}` : ""}</span>
           <button
             type="button"
             onClick={close}
@@ -33,9 +33,9 @@ function InventoryPreciosModal() {
           <div className="space-y-[3px]">
             <div className="grid grid-cols-[40px_88px_56px_42px] items-center gap-x-[6px]">
               <span>Costo</span>
-              <LegacyInput readOnly value="584.9825" align="right" />
+              <LegacyInput readOnly value={formatFixed(cost, 4)} align="right" />
               <span>Decimales</span>
-              <LegacyInput readOnly value="0" align="right" />
+              <LegacyInput readOnly value={String(decimals)} align="right" />
             </div>
 
             <div className="grid grid-cols-[40px_88px_40px_42px] items-center gap-x-[6px]">
@@ -46,12 +46,12 @@ function InventoryPreciosModal() {
             </div>
 
             <div className="space-y-[1px]">
-              {PRICE_ROWS.map((row) => (
-                <div key={row} className="grid grid-cols-[40px_88px_40px_42px] items-center gap-x-[6px]">
-                  <span>{`Lista ${row}`}</span>
-                  <LegacyInput readOnly value={row === 1 ? "59.0500" : "0.0000"} align="right" />
-                  <LegacyInput readOnly value={row === 1 ? "-890.66" : "?"} align="right" />
-                  <LegacyInput readOnly value="0" align="right" />
+              {rows.map((row) => (
+                <div key={row.list} className="grid grid-cols-[60px_60px_60px_42px] items-center gap-x-[6px]">
+                  <span>{`Lista ${row.list}`}</span>
+                  <LegacyInput readOnly value={formatFixed(row.price, 4)} align="right" />
+                  <LegacyInput readOnly value={formatFixed(row.percent, 2)} align="right" />
+                  <LegacyInput readOnly value={formatInteger(row.currency)} align="right" />
                 </div>
               ))}
             </div>
@@ -60,11 +60,11 @@ function InventoryPreciosModal() {
           <div className="flex flex-col justify-between">
             <div className="space-y-[3px]">
               <div className="text-center text-[11px]">Plan POS</div>
-              <LegacyInput readOnly value="0.0000" align="right" />
-              <LegacyInput readOnly value="0.0000" align="right" />
-              <LegacyInput readOnly value="0.0000" align="right" />
+              <LegacyInput readOnly value={formatFixed(planPos[0], 4)} align="right" />
+              <LegacyInput readOnly value={formatFixed(planPos[1], 4)} align="right" />
+              <LegacyInput readOnly value={formatFixed(planPos[2], 4)} align="right" />
               <div className="pt-[6px] text-center text-[11px]">Nivel precio</div>
-              <LegacyInput readOnly value="0" align="right" />
+              <LegacyInput readOnly value={formatInteger(priceLevel)} align="right" />
             </div>
 
             <div className="space-y-[3px]">

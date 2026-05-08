@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "./";
+@source "../index.html";
 
 html,
 body,
@@ -27,4 +29,12 @@ body {
 
 #root .modal-scroll {
   overflow: auto !important;
+}
+
+
+@theme {
+    --color-legacy-btn: #d7d7d7;
+  --color-legacy-btn-hover: #c4ddf7;
+  --color-legacy-btn-border: #9da3ab;
+  --color-legacy-btn-text: #1f2933;
 }

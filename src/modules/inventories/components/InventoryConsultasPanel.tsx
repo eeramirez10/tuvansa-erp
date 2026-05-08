@@ -1,6 +1,7 @@
 import { rightConsultas } from "../constants";
 import { useModal } from "../../ui/hooks/useModal";
 import { MODAL_IDS } from "../../ui/store/modal.store";
+import { legacyButtonClass } from "../../../core/ui-classes";
 
 type TripleConsultaButtonProps = {
   label: string;
@@ -11,22 +12,22 @@ type TripleConsultaButtonProps = {
 
 function TripleConsultaButton({ label, onMainClick, onStarClick, onCtClick }: TripleConsultaButtonProps) {
   return (
-    <div className="flex h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] text-[11px] font-semibold text-[#3f464f]">
+    <div className={["flex h-[24px] "].join("")}>
       <button
         type="button"
         onClick={onMainClick}
-        className="h-full flex-1 border-r border-[#a0a6ad] px-2 text-center leading-[22px]"
+        className={["h-full flex-1  ", legacyButtonClass].join("")}
       >
         {label}
       </button>
       <button
         type="button"
         onClick={onStarClick}
-        className="h-full w-[24px] border-r border-[#a0a6ad] text-center leading-[22px]"
+        className={["h-full w-[24px]  ", legacyButtonClass].join(" ")}
       >
         *
       </button>
-      <button type="button" onClick={onCtClick} className="h-full w-[34px] text-center leading-[22px]">
+      <button type="button" onClick={onCtClick} className={["h-full w-[34px] text-center leading-[22px] border border-[#a0a6ad]", legacyButtonClass].join("")}>
         CT
       </button>
     </div>
@@ -61,6 +62,7 @@ export const InventoryConsultasPanel = () => {
           if (item === "Pedidos por cliente") {
             return (
               <TripleConsultaButton
+              
                 key={`${item}-${idx}`}
                 label={item}
                 onMainClick={openPedidosClienteModal}
@@ -103,7 +105,7 @@ export const InventoryConsultasPanel = () => {
                       ? openVentasDesglosadasModal
                     : undefined
               }
-              className="h-[24px] border border-[#a0a6ad] bg-[#dcdcdc] px-2 text-center text-[11px] leading-[22px] font-semibold text-[#3f464f]"
+              className={legacyButtonClass}
             >
               {item}
             </button>

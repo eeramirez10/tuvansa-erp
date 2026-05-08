@@ -30,6 +30,11 @@ import InventoryInvCtModal from "../../inventories/components/InventoryInvCtModa
 import InventoryPreciosModal from "../../inventories/components/InventoryPreciosModal";
 import InventoryPrepacksModal from "../../inventories/components/InventoryPrepacksModal";
 import InventorySkusModal from "../../inventories/components/InventorySkusModal";
+import InventoryAlternosModal from "../../inventories/components/InventoryAlternosModal";
+import InventoryComponentesModal from "../../inventories/components/InventoryComponentesModal";
+import InventoryEspecificCalModal from "../../inventories/components/InventoryEspecificCalModal";
+import InventoryImplosionModal from "../../inventories/components/InventoryImplosionModal";
+import InventoryCaracteristicasModal from "../../inventories/components/InventoryCaracteristicasModal";
 
 function AppModalHost() {
   return (
@@ -66,6 +71,11 @@ function AppModalHost() {
       <InventoryPreciosModal />
       <InventoryPrepacksModal />
       <InventorySkusModal />
+      <InventoryAlternosModal />
+      <InventoryComponentesModal />
+      <InventoryEspecificCalModal />
+      <InventoryImplosionModal />
+      <InventoryCaracteristicasModal />
     </>
   );
 }

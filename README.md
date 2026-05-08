@@ -17,6 +17,7 @@ Regla: no modificar código sin revisar esos documentos.
 
 ## Comandos
 
+- `fnm use` (Node `22.12.0`, ver `.nvmrc`)
 - `npm install`
 - `npm run dev`
 - `npm run build`

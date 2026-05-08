@@ -33,6 +33,11 @@ export const MODAL_IDS = {
   INVENTORY_PRECIOS: "inventoryPrecios",
   INVENTORY_PREPACKS: "inventoryPrepacks",
   INVENTORY_SKUS: "inventorySkus",
+  INVENTORY_ALTERNOS: "inventoryAlternos",
+  INVENTORY_COMPONENTES: "inventoryComponentes",
+  INVENTORY_ESPECIFIC_CAL: "inventoryEspecificCal",
+  INVENTORY_IMPLOSION: "inventoryImplosion",
+  INVENTORY_CARACTERISTICAS: "inventoryCaracteristicas",
 } as const;
 
 export type ModalId = (typeof MODAL_IDS)[keyof typeof MODAL_IDS];

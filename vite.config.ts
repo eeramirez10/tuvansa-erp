@@ -8,6 +8,18 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vite.dev/config/
 export default defineConfig(async () => ({
   plugins: [react(), tailwindcss()],
+  optimizeDeps: {
+    noDiscovery: true,
+    include: [
+      "react",
+      "react-dom/client",
+      "react/jsx-dev-runtime",
+      "react/jsx-runtime",
+      "react-router-dom",
+      "zustand",
+      "lucide-react",
+    ],
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
@@ -17,7 +29,7 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || true,
+    host: host || "127.0.0.1",
     hmr: host
       ? {
           protocol: "ws",

@@ -21,6 +21,11 @@ export const  InventoryActionsPanel = () => {
   const { open: openPreciosModal } = useModal(MODAL_IDS.INVENTORY_PRECIOS);
   const { open: openPrepacksModal } = useModal(MODAL_IDS.INVENTORY_PREPACKS);
   const { open: openSkusModal } = useModal(MODAL_IDS.INVENTORY_SKUS);
+  const { open: openAlternosModal } = useModal(MODAL_IDS.INVENTORY_ALTERNOS);
+  const { open: openComponentesModal } = useModal(MODAL_IDS.INVENTORY_COMPONENTES);
+  const { open: openEspecificCalModal } = useModal(MODAL_IDS.INVENTORY_ESPECIFIC_CAL);
+  const { open: openImplosionModal } = useModal(MODAL_IDS.INVENTORY_IMPLOSION);
+  const { open: openCaracteristicasModal } = useModal(MODAL_IDS.INVENTORY_CARACTERISTICAS);
 
   const actionsHandlers: Partial<Record<string, () => void>> = {
     almacenes: openWarehousesModal,
@@ -39,12 +44,18 @@ export const  InventoryActionsPanel = () => {
     precios: openPreciosModal,
     prepacks: openPrepacksModal,
     skus: openSkusModal,
+    alternos: openAlternosModal,
+    componentes: openComponentesModal,
+    especificCal: openEspecificCalModal,
+    implosion: openImplosionModal,
+    caracteristicas: openCaracteristicasModal,
   }
 
   const items = inventoryActionItems
   .filter((item) => item.id !== "comprasProd")
   .map((item) => ({
     ...item,
+    
     onClick: actionsHandlers[item.id],
   }))
 

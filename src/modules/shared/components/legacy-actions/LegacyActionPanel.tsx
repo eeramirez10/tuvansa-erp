@@ -1,8 +1,8 @@
-import { legacyButtonClass } from "../../../../core/ui-classes";
+import { legacyButtonClass, legacyPendingButtonClass } from "../../../../core/ui-classes";
 import { LegacyActionItem, LegacyActionsPanelProps } from "./legacy-actions.types";
 
 function ActionButton({ item }: { item: LegacyActionItem }) {
-  const { label, emphasize = false, disabled = false, onClick } = item
+  const { label, emphasize = false, pendingBackend = false, disabled = false, onClick } = item
 
   return (
     <button
@@ -10,10 +10,11 @@ function ActionButton({ item }: { item: LegacyActionItem }) {
       disabled={disabled}
       onClick={onClick}
       className={[
-        `${legacyButtonClass}`,
+        legacyButtonClass,
+        pendingBackend ? legacyPendingButtonClass : "",
         // "h-[24px] border border-[#9da3a8] bg-[#d4d4d4] px-1 text-center text-[11px] leading-[22px]",
         // 'hover:bg-legacy-btn-hover',
-        emphasize ? "font-bold text-[#1a4f88]" : "font-semibold text-[#3f4852]"
+        pendingBackend ? "font-semibold" : emphasize ? "font-bold text-[#1a4f88]" : "font-semibold text-[#3f4852]"
         // "disabled:cursor-not-allowed disabled:opacity-60",
       ].join(" ")}
     >

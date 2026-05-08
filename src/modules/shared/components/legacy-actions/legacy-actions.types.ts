@@ -5,6 +5,7 @@ export type LegacyActionItem = {
   label: string
   section?: LegacyActionSection
   emphasize?: boolean;
+  pendingBackend?: boolean;
   disabled?: boolean;
   onClick?: () => void;
 }

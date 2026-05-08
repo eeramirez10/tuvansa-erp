@@ -1,33 +1,48 @@
 import { rightConsultas } from "../constants";
 import { useModal } from "../../ui/hooks/useModal";
 import { MODAL_IDS } from "../../ui/store/modal.store";
-import { legacyButtonClass } from "../../../core/ui-classes";
+import { legacyButtonClass, legacyPendingButtonClass } from "../../../core/ui-classes";
 
 type TripleConsultaButtonProps = {
   label: string;
   onMainClick?: () => void;
   onStarClick?: () => void;
   onCtClick?: () => void;
+  pendingMain?: boolean;
+  pendingStar?: boolean;
+  pendingCt?: boolean;
 };
 
-function TripleConsultaButton({ label, onMainClick, onStarClick, onCtClick }: TripleConsultaButtonProps) {
+function TripleConsultaButton({
+  label,
+  onMainClick,
+  onStarClick,
+  onCtClick,
+  pendingMain = false,
+  pendingStar = false,
+  pendingCt = false,
+}: TripleConsultaButtonProps) {
   return (
     <div className={["flex h-[24px] "].join("")}>
       <button
         type="button"
         onClick={onMainClick}
-        className={["h-full flex-1  ", legacyButtonClass].join("")}
+        className={["h-full flex-1", legacyButtonClass, pendingMain ? legacyPendingButtonClass : ""].join(" ")}
       >
         {label}
       </button>
       <button
         type="button"
         onClick={onStarClick}
-        className={["h-full w-[24px]  ", legacyButtonClass].join(" ")}
+        className={["h-full w-[24px]", legacyButtonClass, pendingStar ? legacyPendingButtonClass : ""].join(" ")}
       >
         *
       </button>
-      <button type="button" onClick={onCtClick} className={["h-full w-[34px] text-center leading-[22px] border border-[#a0a6ad]", legacyButtonClass].join("")}>
+      <button
+        type="button"
+        onClick={onCtClick}
+        className={["h-full w-[34px]", legacyButtonClass, pendingCt ? legacyPendingButtonClass : ""].join(" ")}
+      >
         CT
       </button>
     </div>
@@ -51,6 +66,22 @@ export const InventoryConsultasPanel = () => {
   const { open: openPedidosAsteriscoModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_ASTERISCO);
   const { open: openPedidosCtModal } = useModal(MODAL_IDS.INVENTORY_PEDIDOS_CT);
 
+  const getConsultaHandler = (item: string): (() => void) | undefined => {
+    if (item === "Auxiliar") return openAuxiliarModal;
+    if (item === "Cotizaciones por cliente") return openCotizacionesClienteModal;
+    if (item === "Ventas por sucursal") return openVentasSucursalModal;
+    if (item === "Ventas anuales") return openVentasAnualesModal;
+    if (item === "Ventas anuales resumen") return openVentasAnualesResumenModal;
+    if (item === "Ordenado a proveedores  CT") return openOrdenadoProveedoresModal;
+    if (item === "Compras por proveedor  DT") return openComprasProveedorModal;
+    if (item === "Compras desglosadas") return openComprasDesglosadasModal;
+    if (item === "Compras anuales") return openComprasAnualesModal;
+    if (item === "Compras anuales resumen") return openComprasAnualesResumenModal;
+    if (item === "Ventas desglosadas") return openVentasDesglosadasModal;
+
+    return undefined;
+  };
+
   return (
     <aside className="border border-[#9ca4ac] bg-[#d7d7d7]">
       <div className="flex h-[26px] items-center justify-between border-b border-[#9ca4ac] px-[6px] text-[11px] font-semibold text-[#4a5158]">
@@ -73,39 +104,26 @@ export const InventoryConsultasPanel = () => {
           }
 
           if (item === "Ventas por cliente") {
-            return <TripleConsultaButton key={`${item}-${idx}`} label={item} onMainClick={openVentasClienteModal} />;
+            return (
+              <TripleConsultaButton
+                key={`${item}-${idx}`}
+                label={item}
+                onMainClick={openVentasClienteModal}
+                pendingStar
+                pendingCt
+              />
+            );
           }
+
+          const onClick = getConsultaHandler(item);
+          const isPending = !onClick;
 
           return (
             <button
               key={`${item}-${idx}`}
               type="button"
-              onClick={
-                item === "Auxiliar"
-                  ? openAuxiliarModal
-                  : item === "Cotizaciones por cliente"
-                    ? openCotizacionesClienteModal
-                    : item === "Ventas por sucursal"
-                      ? openVentasSucursalModal
-                    : item === "Ventas anuales"
-                      ? openVentasAnualesModal
-                    : item === "Ventas anuales resumen"
-                      ? openVentasAnualesResumenModal
-                    : item === "Ordenado a proveedores  CT"
-                      ? openOrdenadoProveedoresModal
-                    : item === "Compras por proveedor  DT"
-                      ? openComprasProveedorModal
-                    : item === "Compras desglosadas"
-                      ? openComprasDesglosadasModal
-                    : item === "Compras anuales"
-                      ? openComprasAnualesModal
-                    : item === "Compras anuales resumen"
-                      ? openComprasAnualesResumenModal
-                    : item === "Ventas desglosadas"
-                      ? openVentasDesglosadasModal
-                    : undefined
-              }
-              className={legacyButtonClass}
+              onClick={onClick}
+              className={[legacyButtonClass, isPending ? legacyPendingButtonClass : ""].join(" ")}
             >
               {item}
             </button>

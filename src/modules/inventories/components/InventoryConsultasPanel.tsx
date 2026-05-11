@@ -140,7 +140,6 @@ export const InventoryConsultasPanel = () => {
     "Piezas surtidas",
     "WIP                   CT",
     "Habilitaciones pendientes",
-    "Documentos",
     "Bonificaciones",
   ]);
 

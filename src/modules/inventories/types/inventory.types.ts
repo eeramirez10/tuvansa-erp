@@ -651,6 +651,69 @@ export type InventoryQuotedSuppliersResponse = {
   };
 };
 
+export type InventoryDocumentSearchRow = {
+  dseq: number | null;
+  document: string;
+  date: string | null;
+  ref: string;
+  ref2: string;
+  warehouse: string;
+  provider: string;
+  client: string;
+  tm: string;
+};
+
+export type InventoryDocumentSearchResponse = {
+  data: InventoryDocumentSearchRow[];
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    count?: number;
+  };
+};
+
+export type InventoryDocumentDetailHeader = {
+  document: string;
+  reference: string;
+  clientCode: string;
+  clientName: string;
+  date: string | null;
+  warehouse: string;
+  tipmv: string;
+  desfact: string;
+  desinv: string;
+  dalmacen: string;
+  diuseq: string;
+};
+
+export type InventoryDocumentDetailLine = {
+  product: string;
+  description: string;
+  entries: number | null;
+  exits: number | null;
+  unit: string;
+  cost: number | null;
+  pieces: number | null;
+  warehouse: string;
+  user: number | null;
+  tm: string;
+};
+
+export type InventoryDocumentDetailResponse = {
+  data: {
+    header: InventoryDocumentDetailHeader | null;
+    lines: InventoryDocumentDetailLine[];
+  };
+  meta: {
+    module?: string;
+    source?: string;
+    code?: string;
+    dseq?: number;
+    count?: number;
+  };
+};
+
 export type InventoryAnnualPurchaseRow = {
   code: string;
   supplier: string;

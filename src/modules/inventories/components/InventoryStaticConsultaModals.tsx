@@ -1,7 +1,15 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Info, Square, X } from "lucide-react";
 import { MODAL_IDS, type ModalId } from "../../ui/store/modal.store";
 import { useModal } from "../../ui/hooks/useModal";
+import {
+  getInventoryDocumentDetailByDseq,
+  searchInventoryDocuments
+} from "../api/inventories.api";
+import type {
+  InventoryDocumentDetailLine,
+  InventoryDocumentSearchRow
+} from "../types/inventory.types";
 
 type Column = {
   label: string;
@@ -85,9 +93,50 @@ function ReadonlyBox({ className = "", children = "" }: { className?: string; ch
   return <span className={`${legacyInputClass} justify-end ${className}`}>{children}</span>;
 }
 
+function ReadonlyButton({
+  className = "",
+  children = "",
+  onClick
+}: {
+  className?: string;
+  children?: ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${legacyInputClass} justify-start text-left ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function ModalFooter({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <footer className={`shrink-0 border-t border-[#a7a7a7] bg-[#ececec] px-[6px] py-[5px] ${className}`}>{children}</footer>;
 }
+
+const formatLegacyDate = (value: string | null): string => {
+  if (!value) {
+    return "";
+  }
+
+  const [year, month, day] = value.slice(0, 10).split("-");
+  if (!year || !month || !day) {
+    return "";
+  }
+
+  return `${day}/${month}/${year}`;
+};
+
+const formatNumeric = (value: number | null, decimals: number): string => {
+  if (value === null || Number.isNaN(value)) {
+    return "";
+  }
+
+  return value.toFixed(decimals);
+};
 
 const bonificacionesColumns = [
   { label: "Proveedor", width: "w-[86px]" },
@@ -144,6 +193,16 @@ const documentosColumns = [
   { label: "Alm.", width: "w-[46px]" },
   { label: "Usr.", width: "w-[42px]" },
   { label: "TM", width: "w-[40px]" },
+] as const;
+
+const documentosSearchColumns = [
+  { label: "Documento", width: "w-[112px]" },
+  { label: "Fecha", width: "w-[88px]" },
+  { label: "Ref.", width: "w-[92px]" },
+  { label: "Ref. 2", width: "w-[92px]" },
+  { label: "Alm", width: "w-[70px]" },
+  { label: "Proveedor", width: "w-[96px]" },
+  { label: "Cliente", width: "w-[96px]" },
 ] as const;
 
 const cotizadoColumns = [
@@ -267,50 +326,508 @@ export function InventoryHabilitacionesPendientesModal() {
 }
 
 export function InventoryDocumentosModal() {
+  const { isOpen: isDocumentosOpen } = useModal(MODAL_IDS.INVENTORY_DOCUMENTOS);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchRows, setSearchRows] = useState<InventoryDocumentSearchRow[]>([]);
+  const [selectedSearchIndex, setSelectedSearchIndex] = useState<number>(-1);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [selectedDseq, setSelectedDseq] = useState<number | null>(null);
+  const [selectedDocumentTm, setSelectedDocumentTm] = useState("");
+  const [documentLines, setDocumentLines] = useState<InventoryDocumentDetailLine[]>([]);
+  const [isDocumentLoading, setIsDocumentLoading] = useState(false);
+  const [documentError, setDocumentError] = useState<string | null>(null);
+  const [documentData, setDocumentData] = useState({
+    document: "",
+    reference: "",
+    clientCode: "",
+    clientName: "",
+    date: "",
+    warehouse: "",
+    tipmv: "",
+    desfact: "",
+    desinv: "",
+    dalmacen: "",
+    diuseq: "",
+  });
+  const [searchFilters, setSearchFilters] = useState({
+    documento: "",
+    fecha: "",
+    ref: "",
+    ref2: "",
+    alm: "",
+    proveedor: "",
+    cliente: ""
+  });
+  const totalEntries = documentLines.reduce((total, row) => total + (row.entries ?? 0), 0);
+  const totalEntriesCost = documentLines.reduce(
+    (total, row) => total + ((row.entries ?? 0) * (row.cost ?? 0)),
+    0
+  );
+
+  const resetSearchModalState = (): void => {
+    setSearchRows([]);
+    setSelectedSearchIndex(-1);
+    setSearchError(null);
+    setIsSearchLoading(false);
+    setSearchFilters({
+      documento: "",
+      fecha: "",
+      ref: "",
+      ref2: "",
+      alm: "",
+      proveedor: "",
+      cliente: ""
+    });
+  };
+
+  const closeSearchModal = (): void => {
+    setIsSearchOpen(false);
+    resetSearchModalState();
+  };
+
+  useEffect(() => {
+    if (!isDocumentosOpen) {
+      setIsSearchOpen(false);
+      resetSearchModalState();
+      setSelectedDseq(null);
+      setSelectedDocumentTm("");
+      setDocumentLines([]);
+      setIsDocumentLoading(false);
+      setDocumentError(null);
+      setDocumentData({
+        document: "",
+        reference: "",
+        clientCode: "",
+        clientName: "",
+        date: "",
+        warehouse: "",
+        tipmv: "",
+        desfact: "",
+        desinv: "",
+        dalmacen: "",
+        diuseq: "",
+      });
+    }
+  }, [isDocumentosOpen]);
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      setSearchRows([]);
+      setSelectedSearchIndex(-1);
+      setSearchError(null);
+      setIsSearchLoading(false);
+      return;
+    }
+
+    const hasSearchInput = Object.values(searchFilters).some((value) => value.trim().length > 0);
+
+    if (!hasSearchInput) {
+      setSearchRows([]);
+      setSelectedSearchIndex(-1);
+      setSearchError(null);
+      setIsSearchLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+    const abortController = new AbortController();
+
+    const timeoutId = window.setTimeout(() => {
+      setIsSearchLoading(true);
+      setSearchError(null);
+
+      void searchInventoryDocuments({
+        document: searchFilters.documento || undefined,
+        date: searchFilters.fecha || undefined,
+        ref: searchFilters.ref || undefined,
+        ref2: searchFilters.ref2 || undefined,
+        warehouse: searchFilters.alm || undefined,
+        provider: searchFilters.proveedor || undefined,
+        client: searchFilters.cliente || undefined,
+        limit: 10,
+        signal: abortController.signal
+      })
+        .then((response) => {
+          if (!isCancelled) {
+            setSearchRows(response.data);
+            setSelectedSearchIndex(response.data.length > 0 ? 0 : -1);
+          }
+        })
+        .catch((error: unknown) => {
+          if (error instanceof DOMException && error.name === "AbortError") {
+            return;
+          }
+          if (!isCancelled) {
+            setSearchRows([]);
+            setSelectedSearchIndex(-1);
+            setSearchError(
+              error instanceof Error ? error.message : "Error cargando búsqueda de documentos."
+            );
+          }
+        })
+        .finally(() => {
+          if (!isCancelled) {
+            setIsSearchLoading(false);
+          }
+        });
+    }, 180);
+
+    return () => {
+      isCancelled = true;
+      window.clearTimeout(timeoutId);
+      abortController.abort();
+    };
+  }, [isSearchOpen, searchFilters]);
+
+  useEffect(() => {
+    if (selectedDseq === null) {
+      setDocumentLines([]);
+      setIsDocumentLoading(false);
+      setDocumentError(null);
+      return;
+    }
+
+    const abortController = new AbortController();
+    setIsDocumentLoading(true);
+    setDocumentError(null);
+
+    void getInventoryDocumentDetailByDseq(selectedDseq, {
+      tm: selectedDocumentTm || undefined,
+      signal: abortController.signal
+    })
+      .then((response) => {
+        const header = response.data.header;
+        if (header) {
+          setDocumentData({
+            document: header.document ?? "",
+            reference: header.reference ?? "",
+            clientCode: header.clientCode ?? "",
+            clientName: header.clientName ?? "",
+            date: formatLegacyDate(header.date),
+            warehouse: header.warehouse ?? ""
+            ,
+            tipmv: selectedDocumentTm || header.tipmv || "",
+            desfact: header.desfact ?? "",
+            desinv: header.desinv ?? "",
+            dalmacen: header.dalmacen ?? "",
+            diuseq: header.diuseq ?? "",
+          });
+        }
+
+        setDocumentLines(response.data.lines);
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setDocumentLines([]);
+        setDocumentError(error instanceof Error ? error.message : "Error cargando documento.");
+      })
+      .finally(() => {
+        if (!abortController.signal.aborted) {
+          setIsDocumentLoading(false);
+        }
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [selectedDseq, selectedDocumentTm]);
+
+  const applySelectedDocument = (row: InventoryDocumentSearchRow | null): void => {
+    if (!row) {
+      return;
+    }
+
+    const normalizedDseq =
+      typeof row.dseq === "number" && Number.isFinite(row.dseq) && row.dseq > 0
+        ? Math.trunc(row.dseq)
+        : null;
+
+    if (normalizedDseq === null) {
+      setSearchError("El documento seleccionado no tiene DSEQ para cargar el detalle.");
+      return;
+    }
+
+    setDocumentLines([]);
+    setDocumentError(null);
+    setSelectedDocumentTm(row.tm ?? "");
+    setDocumentData({
+      document: "",
+      reference: "",
+      clientCode: "",
+      clientName: "",
+      date: "",
+      warehouse: "",
+      tipmv: row.tm ?? "",
+      desfact: "",
+      desinv: "",
+      dalmacen: "",
+      diuseq: "",
+    });
+    setSelectedDseq(null);
+    window.setTimeout(() => {
+      setSelectedDseq(normalizedDseq);
+    }, 0);
+    closeSearchModal();
+  };
+
+  const selectedSearchRow =
+    selectedSearchIndex >= 0 && selectedSearchIndex < searchRows.length
+      ? searchRows[selectedSearchIndex]
+      : null;
+
   return (
-    <LegacyWindow modalId={MODAL_IDS.INVENTORY_DOCUMENTOS} title="Documentos de inventario" className="h-[min(500px,78vh)] w-[min(862px,94vw)]">
-      <div className="grid shrink-0 grid-cols-[72px_86px_80px_1fr_84px_84px] gap-x-[6px] gap-y-[4px] border-b border-[#a7a7a7] bg-[#ececec] px-[8px] py-[10px]">
-        <label className="text-right leading-[18px]">Documento</label>
-        <ReadonlyBox className="w-[86px]" />
-        <label className="text-right leading-[18px]">Referencia</label>
-        <ReadonlyBox className="w-[78px]" />
-        <ReadonlyBox className="w-[82px]" />
-        <ReadonlyBox className="w-[80px]" />
-        <label className="text-right leading-[18px]">Cliente</label>
-        <ReadonlyBox className="w-[86px]" />
-        <ReadonlyBox className="col-span-2 w-[328px]" />
-        <ReadonlyBox className="w-[82px]" />
-        <ReadonlyBox className="w-[80px]" />
-        <label className="text-right leading-[18px]">Fecha</label>
-        <ReadonlyBox className="w-[86px]" />
-        <span className="col-span-2" />
-        <label className="text-right leading-[18px]">Almacén</label>
-        <ReadonlyBox className="w-[80px]" />
+    <LegacyWindow modalId={MODAL_IDS.INVENTORY_DOCUMENTOS} title="Documentos de inventario" className="h-[500px] w-[862px] max-h-[78vh] max-w-[94vw]">
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        <div className="flex shrink-0 justify-between gap-[8px] border-b border-[#a7a7a7] bg-[#ececec] px-[6px] py-[8px]">
+          <div className="grid w-[548px] grid-cols-[72px_84px_64px_58px_1fr] gap-x-[6px] gap-y-[3px]">
+            <label className="text-right leading-[18px]">Documento</label>
+            <ReadonlyButton className="w-[84px]" onClick={() => setIsSearchOpen(true)}>
+              {documentData.document}
+            </ReadonlyButton>
+            <button type="button" onClick={() => setIsSearchOpen(true)} className={`${legacyButtonClass} h-[18px] w-[60px] leading-[16px]`}>
+              Buscar
+            </button>
+            <label className="text-right leading-[18px]">Referencia</label>
+            <ReadonlyBox className="w-[278px] justify-start text-left">{documentData.reference}</ReadonlyBox>
+
+            <label className="text-right leading-[18px]">Cliente</label>
+            <ReadonlyBox className="w-[84px] justify-start text-left">{documentData.clientCode}</ReadonlyBox>
+            <span />
+            <span />
+            <ReadonlyBox className="w-[360px] justify-start text-left">{documentData.clientName}</ReadonlyBox>
+
+            <label className="text-right leading-[18px]">Fecha</label>
+            <ReadonlyBox className="w-[84px] justify-start text-left">{documentData.date}</ReadonlyBox>
+            <span />
+            <span />
+            <span />
+          </div>
+
+          <div className="grid w-[166px] grid-cols-2 gap-x-[2px] gap-y-[3px]">
+            <ReadonlyBox className="w-[80px] justify-start text-left" />
+            <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.tipmv}</ReadonlyBox>
+            <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.desfact}</ReadonlyBox>
+            <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.desinv}</ReadonlyBox>
+            <label className="col-span-2 text-center leading-[18px]">Almacén</label>
+            <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.dalmacen || documentData.warehouse}</ReadonlyBox>
+            <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.diuseq}</ReadonlyBox>
+          </div>
+        </div>
+        <div className="modal-scroll min-h-0 flex-1 overflow-auto bg-white">
+          <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
+            <thead className="sticky top-0 z-10 bg-white">
+              <tr>
+                {documentosColumns.map((column) => (
+                  <th
+                    key={column.label}
+                    className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] font-normal ${(column as Column).align === "right" ? "text-right" : (column as Column).align === "center" ? "text-center" : "text-left"}`}
+                  >
+                    {column.label}
+                  </th>
+                ))}
+                <th className="w-[28px] border border-[#b7b7b7] bg-[#c5c5c5]" />
+              </tr>
+            </thead>
+            <tbody>
+              {documentLines.map((row, rowIndex) => (
+                <tr key={`${row.product}-${rowIndex}`} className="h-[18px]">
+                  <td className="w-[94px] border border-[#b7b7b7] px-[3px]">{row.product}</td>
+                  <td className="w-[272px] border border-[#b7b7b7] px-[3px]">{row.description}</td>
+                  <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.entries, 3)}</td>
+                  <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.exits, 3)}</td>
+                  <td className="w-[34px] border border-[#b7b7b7] px-[3px]">{row.unit}</td>
+                  <td className="w-[84px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.cost, 4)}</td>
+                  <td className="w-[52px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.pieces, 0)}</td>
+                  <td className="w-[46px] border border-[#b7b7b7] px-[3px]">{row.warehouse}</td>
+                  <td className="w-[42px] border border-[#b7b7b7] px-[3px]">{row.user ?? ""}</td>
+                  <td className="w-[40px] border border-[#b7b7b7] px-[3px]">{row.tm}</td>
+                  <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                </tr>
+              ))}
+              {Array.from({ length: Math.max(0, 16 - documentLines.length) }, (_, rowIndex) => (
+                <tr key={`doc-empty-${rowIndex}`} className="h-[18px]">
+                  {documentosColumns.map((column) => (
+                    <td key={`doc-empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
+                  ))}
+                  <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {isDocumentLoading ? (
+          <div className="border-t border-[#a7a7a7] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
+            Cargando documento...
+          </div>
+        ) : null}
+        {documentError ? (
+          <div className="border-t border-[#a7a7a7] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
+            {documentError}
+          </div>
+        ) : null}
+        <ModalFooter className="px-[6px] py-[6px]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-[6px]">
+              <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
+                Imprimir
+              </button>
+              <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
+                Comentarios
+              </button>
+              <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
+                Piezas
+              </button>
+              <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
+                Etiquetas
+              </button>
+              <ReadonlyBox className="w-[60px]">{formatNumeric(totalEntries, 3)}</ReadonlyBox>
+              <ReadonlyBox className="w-[60px]" />
+            </div>
+            <div className="flex items-center gap-[18px] pr-[150px]">
+              <button type="button" className={`${legacyButtonClass} w-[84px] text-[#7f858c]`}>
+                Cancelar
+              </button>
+              <button type="button" className={`${legacyButtonClass} w-[58px] text-[#7f858c] italic`}>
+                CT
+              </button>
+            </div>
+          </div>
+          <div className="mt-[2px] flex justify-center pr-[250px]">
+            <ReadonlyBox className="w-[64px] justify-center">{formatNumeric(totalEntriesCost, 2)}</ReadonlyBox>
+          </div>
+        </ModalFooter>
+
+        {isSearchOpen ? (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/10 p-4">
+            <section className="flex h-[min(446px,78vh)] w-[min(640px,94vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
+              <header className="flex h-[24px] shrink-0 items-center justify-between border-b border-[#9aa2aa] bg-[#f6f6f6] px-[4px]">
+                <div className="flex items-center gap-[3px]">
+                  <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
+                  <h3 className="text-[12px] leading-none font-normal">Búsqueda</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeSearchModal}
+                  className="grid h-[16px] w-[16px] place-items-center bg-transparent"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </header>
+
+              <div className="modal-scroll min-h-0 flex-1 overflow-auto bg-white">
+                <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
+                  <thead className="sticky top-0 z-10 bg-white">
+                    <tr>
+                      {documentosSearchColumns.map((column) => (
+                        <th
+                          key={column.label}
+                          className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] text-left font-normal`}
+                        >
+                          {column.label}
+                        </th>
+                      ))}
+                      <th className="w-[22px] border border-[#b7b7b7] bg-[#c5c5c5]" />
+                    </tr>
+                    <tr>
+                      {documentosSearchColumns.map((column) => {
+                        const key = column.label === "Documento"
+                          ? "documento"
+                          : column.label === "Fecha"
+                            ? "fecha"
+                            : column.label === "Ref."
+                              ? "ref"
+                              : column.label === "Ref. 2"
+                                ? "ref2"
+                                : column.label === "Alm"
+                                  ? "alm"
+                                  : column.label === "Proveedor"
+                                    ? "proveedor"
+                                    : "cliente";
+
+                        return (
+                          <th key={`${column.label}-filter`} className={`${column.width} border border-[#b7b7b7] bg-white p-[2px]`}>
+                            <input
+                              type="text"
+                              value={searchFilters[key]}
+                              onChange={(event) =>
+                                setSearchFilters((previous) => ({
+                                  ...previous,
+                                  [key]: event.target.value
+                                }))
+                              }
+                              className="h-[18px] w-full border border-[#b8c1cb] bg-white px-[4px] text-[11px] text-[#1f2933] outline-none"
+                            />
+                          </th>
+                        );
+                      })}
+                      <th className="w-[22px] border border-[#b7b7b7] bg-white" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {searchRows.map((row, rowIndex) => (
+                      <tr
+                        key={`${row.dseq ?? row.document}-${rowIndex}`}
+                        className={`h-[18px] ${rowIndex === selectedSearchIndex ? "bg-[#cbe2f7]" : ""}`}
+                        onClick={() => setSelectedSearchIndex(rowIndex)}
+                        onDoubleClick={() => applySelectedDocument(row)}
+                      >
+                        <td className="w-[112px] border border-[#b7b7b7] px-[4px]">{row.document}</td>
+                        <td className="w-[88px] border border-[#b7b7b7] px-[4px]">{formatLegacyDate(row.date)}</td>
+                        <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref}</td>
+                        <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref2}</td>
+                        <td className="w-[70px] border border-[#b7b7b7] px-[4px]">{row.warehouse}</td>
+                        <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.provider}</td>
+                        <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.client}</td>
+                        <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                      </tr>
+                    ))}
+                    {Array.from({ length: Math.max(0, 14 - searchRows.length) }, (_, rowIndex) => (
+                      <tr key={`empty-${rowIndex}`} className="h-[18px]">
+                        {documentosSearchColumns.map((column) => (
+                          <td key={`empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
+                        ))}
+                        <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {isSearchLoading ? (
+                <div className="border-t border-[#a7a7a7] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
+                  Cargando documentos...
+                </div>
+              ) : null}
+              {searchError ? (
+                <div className="border-t border-[#a7a7a7] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
+                  {searchError}
+                </div>
+              ) : null}
+
+              <footer className="flex shrink-0 items-center justify-center gap-[12px] border-t border-[#a7a7a7] bg-[#ececec] px-[6px] py-[8px]">
+                <button
+                  type="button"
+                  onClick={() => applySelectedDocument(selectedSearchRow)}
+                  className={`${legacyButtonClass} w-[78px]`}
+                >
+                  OK
+                </button>
+                <button
+                  type="button"
+                  onClick={closeSearchModal}
+                  className={`${legacyButtonClass} w-[78px]`}
+                >
+                  Cancelar
+                </button>
+              </footer>
+            </section>
+          </div>
+        ) : null}
       </div>
-      <LegacyTable columns={documentosColumns} minRows={16} />
-      <ModalFooter className="grid grid-cols-[auto_auto_auto_auto_60px_64px_1fr_auto_auto] items-center gap-[6px]">
-        <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
-          Imprimir
-        </button>
-        <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
-          Comentarios
-        </button>
-        <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
-          Piezas
-        </button>
-        <button type="button" className={`${legacyButtonClass} text-[#7f858c]`}>
-          Etiquetas
-        </button>
-        <ReadonlyBox />
-        <ReadonlyBox />
-        <ReadonlyBox className="justify-center justify-self-center w-[64px]">0.00</ReadonlyBox>
-        <button type="button" className={`${legacyButtonClass} w-[82px] text-[#7f858c]`}>
-          Cancelar
-        </button>
-        <button type="button" className={`${legacyButtonClass} w-[58px] text-[#7f858c] italic`}>
-          CT
-        </button>
-      </ModalFooter>
     </LegacyWindow>
   );
 }

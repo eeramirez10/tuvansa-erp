@@ -4,6 +4,8 @@ import type {
   InventoryAuxiliarResponse,
   InventoryBranchSalesResponse,
   InventoryClassificationResponse,
+  InventoryDocumentDetailResponse,
+  InventoryDocumentSearchResponse,
   InventoryClientOrdersResponse,
   InventoryClientSalesResponse,
   InventoryDetailResponse,
@@ -395,6 +397,80 @@ export const getInventoryQuotedSuppliersByCode = async (
     : `${INVENTORIES_ENDPOINT}/${encodeURIComponent(code)}/quoted-suppliers`;
 
   return fetchJson<InventoryQuotedSuppliersResponse>(url, { signal: options?.signal });
+};
+
+export const searchInventoryDocuments = async (
+  options?: RequestOptions & {
+    code?: string;
+    tipmv?: string;
+    document?: string;
+    date?: string;
+    ref?: string;
+    ref2?: string;
+    warehouse?: string;
+    provider?: string;
+    client?: string;
+    limit?: number;
+  },
+): Promise<InventoryDocumentSearchResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (options?.document) {
+    searchParams.set("document", options.document);
+  }
+  if (options?.code) {
+    searchParams.set("code", options.code);
+  }
+  if (options?.tipmv) {
+    searchParams.set("tipmv", options.tipmv);
+  }
+  if (options?.date) {
+    searchParams.set("date", options.date);
+  }
+  if (options?.ref) {
+    searchParams.set("ref", options.ref);
+  }
+  if (options?.ref2) {
+    searchParams.set("ref2", options.ref2);
+  }
+  if (options?.warehouse) {
+    searchParams.set("warehouse", options.warehouse);
+  }
+  if (options?.provider) {
+    searchParams.set("provider", options.provider);
+  }
+  if (options?.client) {
+    searchParams.set("client", options.client);
+  }
+  if (typeof options?.limit === "number" && Number.isFinite(options.limit)) {
+    searchParams.set("limit", String(Math.trunc(options.limit)));
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/documents-search?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/documents-search`;
+
+  return fetchJson<InventoryDocumentSearchResponse>(url, { signal: options?.signal });
+};
+
+export const getInventoryDocumentDetailByDseq = async (
+  dseq: number,
+  options?: RequestOptions & { tm?: string },
+): Promise<InventoryDocumentDetailResponse> => {
+  const searchParams = new URLSearchParams();
+
+  if (options?.tm) {
+    searchParams.set("tm", options.tm);
+  }
+
+  const url = searchParams.size
+    ? `${INVENTORIES_ENDPOINT}/documents/${encodeURIComponent(String(Math.trunc(dseq)))}?${searchParams.toString()}`
+    : `${INVENTORIES_ENDPOINT}/documents/${encodeURIComponent(String(Math.trunc(dseq)))}`;
+
+  return fetchJson<InventoryDocumentDetailResponse>(
+    url,
+    { signal: options?.signal },
+  );
 };
 
 export const getInventoryAnnualPurchasesByCode = async (

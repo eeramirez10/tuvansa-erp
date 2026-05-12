@@ -1,7 +1,13 @@
 export const formatFixed = (value: number | null, decimals: number): string => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    useGrouping: true,
+  });
+
   if (value === null || Number.isNaN(value)) {
-    return (0).toFixed(decimals);
+    return formatter.format(0);
   }
 
-  return value.toFixed(decimals);
+  return formatter.format(value);
 };

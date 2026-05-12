@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Info, Square, X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { MODAL_IDS, type ModalId } from "../../ui/store/modal.store";
 import { useModal } from "../../ui/hooks/useModal";
+import { ManagedWindowFrame } from "../../ui/components/ManagedWindowFrame";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import {
   getInventoryDocumentDetailByDseq,
   searchInventoryDocuments
@@ -10,6 +12,7 @@ import type {
   InventoryDocumentDetailLine,
   InventoryDocumentSearchRow
 } from "../types/inventory.types";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
 
 type Column = {
   label: string;
@@ -30,30 +33,16 @@ const legacyButtonClass = "h-[23px] border border-[#a5abb1] bg-[#dedede] px-3 te
 function LegacyWindow({ modalId, title, className, children }: LegacyWindowProps) {
   const { isOpen, close } = useModal(modalId);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
-      <section className={`flex flex-col border border-[#2f8ce8] bg-[#ececec] text-[11px] text-black ${className}`}>
-        <header className="flex h-[24px] shrink-0 items-center justify-between border-b border-[#9aa2aa] bg-[#f6f6f6] px-[4px]">
-          <div className="flex items-center gap-[3px]">
-            <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
-            <h2 className="text-[12px] leading-none font-normal">{title}</h2>
-          </div>
-          <div className="flex items-center gap-[8px]">
-            <button type="button" className="grid h-[16px] w-[16px] place-items-center bg-transparent">
-              <Square className="h-3 w-3" />
-            </button>
-            <button type="button" onClick={close} className="grid h-[16px] w-[16px] place-items-center bg-transparent">
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </header>
-        {children}
-      </section>
-    </div>
+    <ManagedWindowFrame
+      windowId={modalId}
+      isOpen={isOpen}
+      title={title}
+      className={className}
+      onClose={close}
+    >
+      {children}
+    </ManagedWindowFrame>
   );
 }
 
@@ -135,7 +124,11 @@ const formatNumeric = (value: number | null, decimals: number): string => {
     return "";
   }
 
-  return value.toFixed(decimals);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+    useGrouping: true,
+  }).format(value);
 };
 
 const bonificacionesColumns = [
@@ -289,12 +282,8 @@ export function InventoryPiezasSurtidasModal() {
 export function InventoryPiezasModal() {
   const { isOpen, close } = useModal(MODAL_IDS.INVENTORY_PIEZAS);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_PIEZAS} isOpen={isOpen}>
       <section className="w-[350px] border border-[#9da3a8] bg-[#f2f2f2] text-[11px] text-black shadow">
         <div className="flex items-center gap-[12px] px-[10px] py-[36px]">
           <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-[#0878cc] text-white">
@@ -308,7 +297,7 @@ export function InventoryPiezasModal() {
           </button>
         </div>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 
@@ -350,7 +339,7 @@ export function InventoryDocumentosModal() {
     dalmacen: "",
     diuseq: "",
   });
-  const [searchFilters, setSearchFilters] = useState({
+  const emptySearchFilters = {
     documento: "",
     fecha: "",
     ref: "",
@@ -358,6 +347,12 @@ export function InventoryDocumentosModal() {
     alm: "",
     proveedor: "",
     cliente: ""
+  };
+  const [searchFilters, setSearchFilters] = useState({
+    ...emptySearchFilters
+  });
+  const [submittedSearchFilters, setSubmittedSearchFilters] = useState({
+    ...emptySearchFilters
   });
   const totalEntries = documentLines.reduce((total, row) => total + (row.entries ?? 0), 0);
   const totalEntriesCost = documentLines.reduce(
@@ -365,20 +360,39 @@ export function InventoryDocumentosModal() {
     0
   );
 
+  const submitSearchFilters = (): void => {
+    setSubmittedSearchFilters({ ...searchFilters });
+  };
+
+  const [searchRequestKey, setSearchRequestKey] = useState(0);
+
+  const haveSearchFiltersChanged = (): boolean => {
+    return (Object.keys(emptySearchFilters) as Array<keyof typeof emptySearchFilters>).some((key) => {
+      return searchFilters[key].trim() !== submittedSearchFilters[key].trim();
+    });
+  };
+
+  const runSearch = (): void => {
+    if (!haveSearchFiltersChanged()) {
+      return;
+    }
+
+    submitSearchFilters();
+    setSearchRequestKey((previous) => previous + 1);
+  };
+
   const resetSearchModalState = (): void => {
     setSearchRows([]);
     setSelectedSearchIndex(-1);
     setSearchError(null);
     setIsSearchLoading(false);
     setSearchFilters({
-      documento: "",
-      fecha: "",
-      ref: "",
-      ref2: "",
-      alm: "",
-      proveedor: "",
-      cliente: ""
+      ...emptySearchFilters
     });
+    setSubmittedSearchFilters({
+      ...emptySearchFilters
+    });
+    setSearchRequestKey(0);
   };
 
   const closeSearchModal = (): void => {
@@ -420,7 +434,7 @@ export function InventoryDocumentosModal() {
       return;
     }
 
-    const hasSearchInput = Object.values(searchFilters).some((value) => value.trim().length > 0);
+    const hasSearchInput = Object.values(submittedSearchFilters).some((value) => value.trim().length > 0);
 
     if (!hasSearchInput) {
       setSearchRows([]);
@@ -438,13 +452,13 @@ export function InventoryDocumentosModal() {
       setSearchError(null);
 
       void searchInventoryDocuments({
-        document: searchFilters.documento || undefined,
-        date: searchFilters.fecha || undefined,
-        ref: searchFilters.ref || undefined,
-        ref2: searchFilters.ref2 || undefined,
-        warehouse: searchFilters.alm || undefined,
-        provider: searchFilters.proveedor || undefined,
-        client: searchFilters.cliente || undefined,
+        document: submittedSearchFilters.documento || undefined,
+        date: submittedSearchFilters.fecha || undefined,
+        ref: submittedSearchFilters.ref || undefined,
+        ref2: submittedSearchFilters.ref2 || undefined,
+        warehouse: submittedSearchFilters.alm || undefined,
+        provider: submittedSearchFilters.proveedor || undefined,
+        client: submittedSearchFilters.cliente || undefined,
         limit: 10,
         signal: abortController.signal
       })
@@ -478,7 +492,7 @@ export function InventoryDocumentosModal() {
       window.clearTimeout(timeoutId);
       abortController.abort();
     };
-  }, [isSearchOpen, searchFilters]);
+  }, [isSearchOpen, submittedSearchFilters, searchRequestKey]);
 
   useEffect(() => {
     if (selectedDseq === null) {
@@ -617,53 +631,51 @@ export function InventoryDocumentosModal() {
             <ReadonlyBox className="w-[80px] justify-start text-left">{documentData.diuseq}</ReadonlyBox>
           </div>
         </div>
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto bg-white">
-          <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
-            <thead className="sticky top-0 z-10 bg-white">
-              <tr>
-                {documentosColumns.map((column) => (
-                  <th
-                    key={column.label}
-                    className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] font-normal ${(column as Column).align === "right" ? "text-right" : (column as Column).align === "center" ? "text-center" : "text-left"}`}
-                  >
-                    {column.label}
-                  </th>
-                ))}
-                <th className="w-[28px] border border-[#b7b7b7] bg-[#c5c5c5]" />
-              </tr>
-            </thead>
-            <tbody>
-              {documentLines.map((row, rowIndex) => (
-                <tr key={`${row.product}-${rowIndex}`} className="h-[18px]">
-                  <td className="w-[94px] border border-[#b7b7b7] px-[3px]">{row.product}</td>
-                  <td className="w-[272px] border border-[#b7b7b7] px-[3px]">{row.description}</td>
-                  <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.entries, 3)}</td>
-                  <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.exits, 3)}</td>
-                  <td className="w-[34px] border border-[#b7b7b7] px-[3px]">{row.unit}</td>
-                  <td className="w-[84px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.cost, 4)}</td>
-                  <td className="w-[52px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.pieces, 0)}</td>
-                  <td className="w-[46px] border border-[#b7b7b7] px-[3px]">{row.warehouse}</td>
-                  <td className="w-[42px] border border-[#b7b7b7] px-[3px]">{row.user ?? ""}</td>
-                  <td className="w-[40px] border border-[#b7b7b7] px-[3px]">{row.tm}</td>
-                  <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
-                </tr>
-              ))}
-              {Array.from({ length: Math.max(0, 16 - documentLines.length) }, (_, rowIndex) => (
-                <tr key={`doc-empty-${rowIndex}`} className="h-[18px]">
+        <div className="relative min-h-0 flex-1">
+          <div className="modal-scroll min-h-0 h-full overflow-auto bg-white">
+            <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
+              <thead className="sticky top-0 z-10 bg-white">
+                <tr>
                   {documentosColumns.map((column) => (
-                    <td key={`doc-empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
+                    <th
+                      key={column.label}
+                      className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] font-normal ${(column as Column).align === "right" ? "text-right" : (column as Column).align === "center" ? "text-center" : "text-left"}`}
+                    >
+                      {column.label}
+                    </th>
                   ))}
-                  <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                  <th className="w-[28px] border border-[#b7b7b7] bg-[#c5c5c5]" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {isDocumentLoading ? (
-          <div className="border-t border-[#a7a7a7] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
-            Cargando documento...
+              </thead>
+              <tbody>
+                {documentLines.map((row, rowIndex) => (
+                  <tr key={`${row.product}-${rowIndex}`} className="h-[18px]">
+                    <td className="w-[94px] border border-[#b7b7b7] px-[3px]">{row.product}</td>
+                    <td className="w-[272px] border border-[#b7b7b7] px-[3px]">{row.description}</td>
+                    <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.entries, 3)}</td>
+                    <td className="w-[76px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.exits, 3)}</td>
+                    <td className="w-[34px] border border-[#b7b7b7] px-[3px]">{row.unit}</td>
+                    <td className="w-[84px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.cost, 4)}</td>
+                    <td className="w-[52px] border border-[#b7b7b7] px-[3px] text-right">{formatNumeric(row.pieces, 0)}</td>
+                    <td className="w-[46px] border border-[#b7b7b7] px-[3px]">{row.warehouse}</td>
+                    <td className="w-[42px] border border-[#b7b7b7] px-[3px]">{row.user ?? ""}</td>
+                    <td className="w-[40px] border border-[#b7b7b7] px-[3px]">{row.tm}</td>
+                    <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                  </tr>
+                ))}
+                {Array.from({ length: Math.max(0, 16 - documentLines.length) }, (_, rowIndex) => (
+                  <tr key={`doc-empty-${rowIndex}`} className="h-[18px]">
+                    {documentosColumns.map((column) => (
+                      <td key={`doc-empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
+                    ))}
+                    <td className="w-[28px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ) : null}
+          {isDocumentLoading ? <LegacyModalLoader label="Cargando documento..." /> : null}
+        </div>
         {documentError ? (
           <div className="border-t border-[#a7a7a7] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
             {documentError}
@@ -702,8 +714,8 @@ export function InventoryDocumentosModal() {
         </ModalFooter>
 
         {isSearchOpen ? (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/10 p-4">
-            <section className="flex h-[min(446px,78vh)] w-[min(640px,94vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
+          <ManagedWindowLayer windowId="inventoryDocumentosSearchWindow" isOpen={isSearchOpen}>
+            <section className="flex h-[min(446px,78vh)] w-[min(640px,94vw)] flex-col border border-[#2f8ce8] bg-[#ececec] shadow-[0_8px_18px_rgba(0,0,0,0.22)]">
               <header className="flex h-[24px] shrink-0 items-center justify-between border-b border-[#9aa2aa] bg-[#f6f6f6] px-[4px]">
                 <div className="flex items-center gap-[3px]">
                   <span className="h-[12px] w-[12px] border border-[#8fa6cc] bg-white" />
@@ -718,90 +730,94 @@ export function InventoryDocumentosModal() {
                 </button>
               </header>
 
-              <div className="modal-scroll min-h-0 flex-1 overflow-auto bg-white">
-                <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
-                  <thead className="sticky top-0 z-10 bg-white">
-                    <tr>
-                      {documentosSearchColumns.map((column) => (
-                        <th
-                          key={column.label}
-                          className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] text-left font-normal`}
-                        >
-                          {column.label}
-                        </th>
-                      ))}
-                      <th className="w-[22px] border border-[#b7b7b7] bg-[#c5c5c5]" />
-                    </tr>
-                    <tr>
-                      {documentosSearchColumns.map((column) => {
-                        const key = column.label === "Documento"
-                          ? "documento"
-                          : column.label === "Fecha"
-                            ? "fecha"
-                            : column.label === "Ref."
-                              ? "ref"
-                              : column.label === "Ref. 2"
-                                ? "ref2"
-                                : column.label === "Alm"
-                                  ? "alm"
-                                  : column.label === "Proveedor"
-                                    ? "proveedor"
-                                    : "cliente";
+              <div className="relative min-h-0 flex-1">
+                <div className="modal-scroll min-h-0 h-full overflow-auto bg-white">
+                  <table className="w-max min-w-full border-collapse text-[11px] leading-none text-black">
+                    <thead className="sticky top-0 z-10 bg-white">
+                      <tr>
+                        {documentosSearchColumns.map((column) => (
+                          <th
+                            key={column.label}
+                            className={`${column.width} border border-[#a8a8a8] px-[3px] py-[5px] text-left font-normal`}
+                          >
+                            {column.label}
+                          </th>
+                        ))}
+                        <th className="w-[22px] border border-[#b7b7b7] bg-[#c5c5c5]" />
+                      </tr>
+                      <tr>
+                        {documentosSearchColumns.map((column) => {
+                          const key = column.label === "Documento"
+                            ? "documento"
+                            : column.label === "Fecha"
+                              ? "fecha"
+                              : column.label === "Ref."
+                                ? "ref"
+                                : column.label === "Ref. 2"
+                                  ? "ref2"
+                                  : column.label === "Alm"
+                                    ? "alm"
+                                    : column.label === "Proveedor"
+                                      ? "proveedor"
+                                      : "cliente";
 
-                        return (
-                          <th key={`${column.label}-filter`} className={`${column.width} border border-[#b7b7b7] bg-white p-[2px]`}>
-                            <input
-                              type="text"
-                              value={searchFilters[key]}
+                          return (
+                            <th key={`${column.label}-filter`} className={`${column.width} border border-[#b7b7b7] bg-white p-[2px]`}>
+                              <input
+                                type="text"
+                                value={searchFilters[key]}
                               onChange={(event) =>
                                 setSearchFilters((previous) => ({
                                   ...previous,
                                   [key]: event.target.value
                                 }))
                               }
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                  event.preventDefault();
+                                  runSearch();
+                                }
+                              }}
+                              onBlur={runSearch}
                               className="h-[18px] w-full border border-[#b8c1cb] bg-white px-[4px] text-[11px] text-[#1f2933] outline-none"
                             />
-                          </th>
-                        );
-                      })}
-                      <th className="w-[22px] border border-[#b7b7b7] bg-white" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchRows.map((row, rowIndex) => (
-                      <tr
-                        key={`${row.dseq ?? row.document}-${rowIndex}`}
-                        className={`h-[18px] ${rowIndex === selectedSearchIndex ? "bg-[#cbe2f7]" : ""}`}
-                        onClick={() => setSelectedSearchIndex(rowIndex)}
-                        onDoubleClick={() => applySelectedDocument(row)}
-                      >
-                        <td className="w-[112px] border border-[#b7b7b7] px-[4px]">{row.document}</td>
-                        <td className="w-[88px] border border-[#b7b7b7] px-[4px]">{formatLegacyDate(row.date)}</td>
-                        <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref}</td>
-                        <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref2}</td>
-                        <td className="w-[70px] border border-[#b7b7b7] px-[4px]">{row.warehouse}</td>
-                        <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.provider}</td>
-                        <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.client}</td>
-                        <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                            </th>
+                          );
+                        })}
+                        <th className="w-[22px] border border-[#b7b7b7] bg-white" />
                       </tr>
-                    ))}
-                    {Array.from({ length: Math.max(0, 14 - searchRows.length) }, (_, rowIndex) => (
-                      <tr key={`empty-${rowIndex}`} className="h-[18px]">
-                        {documentosSearchColumns.map((column) => (
-                          <td key={`empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
-                        ))}
-                        <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {isSearchLoading ? (
-                <div className="border-t border-[#a7a7a7] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
-                  Cargando documentos...
+                    </thead>
+                    <tbody>
+                      {searchRows.map((row, rowIndex) => (
+                        <tr
+                          key={`${row.dseq ?? row.document}-${rowIndex}`}
+                          className={`h-[18px] ${rowIndex === selectedSearchIndex ? "bg-[#cbe2f7]" : ""}`}
+                          onClick={() => setSelectedSearchIndex(rowIndex)}
+                          onDoubleClick={() => applySelectedDocument(row)}
+                        >
+                          <td className="w-[112px] border border-[#b7b7b7] px-[4px]">{row.document}</td>
+                          <td className="w-[88px] border border-[#b7b7b7] px-[4px]">{formatLegacyDate(row.date)}</td>
+                          <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref}</td>
+                          <td className="w-[92px] border border-[#b7b7b7] px-[4px]">{row.ref2}</td>
+                          <td className="w-[70px] border border-[#b7b7b7] px-[4px]">{row.warehouse}</td>
+                          <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.provider}</td>
+                          <td className="w-[96px] border border-[#b7b7b7] px-[4px]">{row.client}</td>
+                          <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                        </tr>
+                      ))}
+                      {Array.from({ length: Math.max(0, 14 - searchRows.length) }, (_, rowIndex) => (
+                        <tr key={`empty-${rowIndex}`} className="h-[18px]">
+                          {documentosSearchColumns.map((column) => (
+                            <td key={`empty-${rowIndex}-${column.label}`} className={`${column.width} border border-[#b7b7b7] px-[3px]`} />
+                          ))}
+                          <td className="w-[22px] border border-[#b7b7b7] bg-[#f1f1f1]" />
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              ) : null}
+                {isSearchLoading ? <LegacyModalLoader label="Cargando búsqueda..." /> : null}
+              </div>
               {searchError ? (
                 <div className="border-t border-[#a7a7a7] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
                   {searchError}
@@ -825,7 +841,7 @@ export function InventoryDocumentosModal() {
                 </button>
               </footer>
             </section>
-          </div>
+          </ManagedWindowLayer>
         ) : null}
       </div>
     </LegacyWindow>

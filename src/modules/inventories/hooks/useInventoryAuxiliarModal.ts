@@ -7,6 +7,7 @@ import { useInventoriesStore } from "../store/inventories.store";
 import type { InventoryAuxiliarRow } from "../types/inventory.types";
 
 export type AuxiliarRow = {
+  rowId: string;
   date: string | null;
   document: string;
   tm: string;
@@ -29,7 +30,8 @@ const asNumber = (value: number | null | undefined): number => {
   return value;
 };
 
-const mapAuxiliarToRow = (row: InventoryAuxiliarRow): AuxiliarRow => ({
+const mapAuxiliarToRow = (row: InventoryAuxiliarRow, index: number): AuxiliarRow => ({
+  rowId: `${row.date ?? "null"}|${row.document}|${row.tm}|${row.warehouse}|${index}`,
   date: row.date,
   document: row.document,
   tm: row.tm,
@@ -114,7 +116,7 @@ export const useInventoryAuxiliarModal = () => {
           signal: abortController.signal,
         });
         if (!isCancelled) {
-          const mappedRows = response.data.map(mapAuxiliarToRow);
+          const mappedRows = response.data.map((row, index) => mapAuxiliarToRow(row, index));
           setRows(mappedRows);
           setStockPrevious(
             response.meta.stockPrevious === undefined || Number.isNaN(response.meta.stockPrevious)

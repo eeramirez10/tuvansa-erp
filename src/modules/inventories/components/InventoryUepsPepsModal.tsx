@@ -2,6 +2,9 @@ import { Square, X } from "lucide-react";
 import { useInventoryUepsPepsModal } from "../hooks/useInventoryUepsPepsModal";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 function InventoryUepsPepsModal() {
   const { isOpen, close, currentCode, rows, isLoading, error, totalQuantity, totalAverageCost } =
@@ -12,7 +15,7 @@ function InventoryUepsPepsModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_UEPS_PEPS} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -37,7 +40,7 @@ function InventoryUepsPepsModal() {
           </div>
         </header>
 
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
@@ -83,11 +86,7 @@ function InventoryUepsPepsModal() {
             </tbody>
           </table>
 
-          {isLoading ? (
-            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
-              Cargando UEPS/PEPS...
-            </div>
-          ) : null}
+          {isLoading ? <LegacyModalLoader label="Cargando UEPS/PEPS..." /> : null}
           {error ? (
             <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
               {error}
@@ -110,7 +109,7 @@ function InventoryUepsPepsModal() {
           </button>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

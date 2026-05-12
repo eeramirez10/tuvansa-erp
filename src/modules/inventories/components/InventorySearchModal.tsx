@@ -1,5 +1,8 @@
 import { Check, Square, X } from "lucide-react";
 import { useInventorySearchModal } from "../hooks/useInventorySearchModal";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const MODAL_GRID_COLUMNS = "grid-cols-[170px_1fr_110px_100px_110px]";
 
@@ -19,10 +22,18 @@ const formatInactiveDate = (value: string | null): string => {
 
 const formatStockActual = (value: number | null): string => {
   if (value === null || Number.isNaN(value)) {
-    return "0.000";
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+      useGrouping: true,
+    }).format(0);
   }
 
-  return value.toFixed(3);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+    useGrouping: true,
+  }).format(value);
 };
 
 function InventorySearchModal() {
@@ -50,7 +61,7 @@ function InventorySearchModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_SEARCH} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#8f8f8f] bg-[#ececec] shadow-[0_12px_30px_rgba(0,0,0,0.35)]">
         <header className="flex h-[46px] items-center justify-between border-b border-[#9f9f9f] bg-[#e7e7e7] px-3">
           <div className="flex items-center gap-2">
@@ -108,10 +119,8 @@ function InventorySearchModal() {
             <span />
           </form>
 
-          <div className="modal-scroll min-h-0 flex-1 overflow-auto border border-t-0 border-[#8f8f8f] bg-[#f5f5f5]">
+          <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border border-t-0 border-[#8f8f8f] bg-[#f5f5f5]">
             {listError ? <div className="px-2 py-2 text-[11px] font-semibold text-[#8f2b2b]">{listError}</div> : null}
-
-            {isListLoading ? <div className="px-2 py-2 text-[11px] font-semibold text-[#4b5561]">Buscando...</div> : null}
 
             {!isListLoading && list.length === 0 ? (
               <div className="px-2 py-2 text-[11px] font-semibold text-[#4b5561]">Sin resultados</div>
@@ -145,6 +154,7 @@ function InventorySearchModal() {
                 </button>
               );
             })}
+            {isListLoading ? <LegacyModalLoader label="Buscando..." /> : null}
           </div>
         </section>
 
@@ -190,7 +200,7 @@ function InventorySearchModal() {
           </div>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

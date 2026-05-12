@@ -1,5 +1,8 @@
 import { X } from "lucide-react";
 import { useInventoryWarehousesModal } from "../hooks/useInventoryWarehousesModal";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const COLUMNS = [
   { key: "cd", label: "CD", width: "w-[36px]" },
@@ -63,17 +66,25 @@ const NUMERIC_COLUMNS = new Set<string>([
 const formatQty = (value: unknown): string => {
   const n = Number(value ?? 0);
   if (Number.isNaN(n)) {
-    return "0.000";
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+      useGrouping: true,
+    }).format(0);
   }
-  return n.toFixed(3);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+    useGrouping: true,
+  }).format(n);
 };
 
 const formatInt = (value: unknown): string => {
   const n = Number(value ?? 0);
   if (Number.isNaN(n)) {
-    return "0";
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0, useGrouping: true }).format(0);
   }
-  return String(Math.trunc(n));
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0, useGrouping: true }).format(Math.trunc(n));
 };
 
 const formatLegacyDate = (value: string | null): string => {
@@ -98,7 +109,7 @@ function InventoryWarehousesModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_WAREHOUSES} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -115,7 +126,7 @@ function InventoryWarehousesModal() {
           </button>
         </header>
 
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
@@ -176,11 +187,7 @@ function InventoryWarehousesModal() {
               ))}
             </tbody>
           </table>
-          {isLoading ? (
-            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
-              Cargando almacenes...
-            </div>
-          ) : null}
+          {isLoading ? <LegacyModalLoader label="Cargando almacenes..." /> : null}
           {error ? (
             <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
               {error}
@@ -212,7 +219,7 @@ function InventoryWarehousesModal() {
           </button>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

@@ -2,6 +2,9 @@ import { Square, X } from "lucide-react";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { useInventoryCotizadoProveedoresModal } from "../hooks/useInventoryCotizadoProveedoresModal";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const COLUMNS = [
   { key: "code", label: "Código", width: "w-[84px]" },
@@ -35,7 +38,7 @@ function InventoryCotizadoProveedoresModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_COTIZADO_PROVEEDORES} isOpen={isOpen}>
       <section className="flex h-[min(500px,76vh)] w-[min(1060px,96vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -62,7 +65,7 @@ function InventoryCotizadoProveedoresModal() {
           </div>
         </header>
 
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
@@ -77,17 +80,7 @@ function InventoryCotizadoProveedoresModal() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={COLUMNS.length}
-                    className="border border-[#a6adb5] px-2 py-[6px] text-center text-[11px] text-[#45515f]"
-                  >
-                    Cargando cotizado a proveedores...
-                  </td>
-                </tr>
-              ) : null}
-              {!isLoading && error ? (
+              {error ? (
                 <tr>
                   <td
                     colSpan={COLUMNS.length}
@@ -97,7 +90,7 @@ function InventoryCotizadoProveedoresModal() {
                   </td>
                 </tr>
               ) : null}
-              {!isLoading && !error && rows.length === 0 ? (
+              {!error && rows.length === 0 ? (
                 <tr>
                   <td
                     colSpan={COLUMNS.length}
@@ -124,6 +117,7 @@ function InventoryCotizadoProveedoresModal() {
               ))}
             </tbody>
           </table>
+          {isLoading ? <LegacyModalLoader label="Cargando cotizado a proveedores..." /> : null}
         </div>
 
         <footer className="flex items-center justify-between gap-4 border-t border-[#a1a8af] bg-[#ececec] px-2 py-1">
@@ -157,7 +151,7 @@ function InventoryCotizadoProveedoresModal() {
           </div>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

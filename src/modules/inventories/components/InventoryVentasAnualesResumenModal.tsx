@@ -1,6 +1,9 @@
 import { Square, X } from "lucide-react";
 import { formatInteger } from "../utils/formatInteger";
 import { useInventoryVentasAnualesResumenModal } from "../hooks/useInventoryVentasAnualesResumenModal";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const MONTH_LABELS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"] as const;
 const monthKeys = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"] as const;
@@ -70,7 +73,7 @@ function InventoryVentasAnualesResumenModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_VENTAS_ANUALES_RESUMEN} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -96,7 +99,7 @@ function InventoryVentasAnualesResumenModal() {
         </header>
 
         <div className="grid min-h-0 flex-1 grid-cols-[1fr]">
-          <div className="modal-scroll min-h-0 overflow-auto border-r border-[#9ca3ab] border-b border-[#9ca3ab]">
+          <div className="relative modal-scroll min-h-0 overflow-auto border-r border-[#9ca3ab] border-b border-[#9ca3ab]">
             <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
               <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
                 <tr>
@@ -133,6 +136,7 @@ function InventoryVentasAnualesResumenModal() {
                 ))}
               </tbody>
             </table>
+            {isLoading ? <LegacyModalLoader label="Cargando ventas anuales resumen..." /> : null}
           </div>
 
           <div className="border-b border-[#9ca3ab] bg-[#ececec] p-2 text-[11px] text-[#2a3643]">
@@ -210,15 +214,15 @@ function InventoryVentasAnualesResumenModal() {
           </div>
         </div>
 
-        {(isLoading || error) && (
+        {error ? (
           <div
-            className={`border-t border-[#a6adb5] px-2 py-1 text-[11px] ${error ? "bg-[#ffe7e7] text-[#8b1e1e]" : "bg-[#f6f6f6] text-[#334155]"}`}
+            className="border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]"
           >
-            {error ?? "Cargando ventas anuales resumen..."}
+            {error}
           </div>
-        )}
+        ) : null}
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

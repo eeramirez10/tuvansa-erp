@@ -2,6 +2,9 @@ import { Square, X } from "lucide-react";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { useInventoryComprasDesglosadasModal } from "../hooks/useInventoryComprasDesglosadasModal";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const COLUMNS = [
   { key: "code", label: "Código", width: "w-[74px]" },
@@ -23,7 +26,7 @@ function InventoryComprasDesglosadasModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_COMPRAS_DESGLOSADAS} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -50,7 +53,7 @@ function InventoryComprasDesglosadasModal() {
           </div>
         </header>
 
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
@@ -65,17 +68,7 @@ function InventoryComprasDesglosadasModal() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={COLUMNS.length}
-                    className="border border-[#a6adb5] px-2 py-[6px] text-center text-[11px] text-[#45515f]"
-                  >
-                    Cargando compras desglosadas...
-                  </td>
-                </tr>
-              ) : null}
-              {!isLoading && error ? (
+              {error ? (
                 <tr>
                   <td
                     colSpan={COLUMNS.length}
@@ -85,7 +78,7 @@ function InventoryComprasDesglosadasModal() {
                   </td>
                 </tr>
               ) : null}
-              {!isLoading && !error && rows.length === 0 ? (
+              {!error && rows.length === 0 ? (
                 <tr>
                   <td
                     colSpan={COLUMNS.length}
@@ -110,6 +103,7 @@ function InventoryComprasDesglosadasModal() {
               ))}
             </tbody>
           </table>
+          {isLoading ? <LegacyModalLoader label="Cargando compras desglosadas..." /> : null}
         </div>
 
         <footer className="flex h-[38px] items-center gap-[8px] border-t border-[#a1a8af] bg-[#ececec] px-2">
@@ -127,7 +121,7 @@ function InventoryComprasDesglosadasModal() {
           </button>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

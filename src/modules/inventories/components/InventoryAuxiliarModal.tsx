@@ -1,7 +1,12 @@
 import { Square, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useInventoryAuxiliarModal } from "../hooks/useInventoryAuxiliarModal";
+import type { AuxiliarRow as InventoryAuxiliarModalRow } from "../hooks/useInventoryAuxiliarModal";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
+import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 const COLUMNS = [
   { key: "fecha", label: "Fecha", width: "w-[96px]" },
@@ -19,6 +24,56 @@ const COLUMNS = [
   { key: "referencia", label: "Referencia ellos", width: "w-[130px]" },
 ] as const;
 
+type AuxiliarSortKey = (typeof COLUMNS)[number]["key"];
+type AuxiliarSortDirection = "asc" | "desc";
+type AuxiliarSortState =
+  | {
+      key: AuxiliarSortKey;
+      direction: AuxiliarSortDirection;
+    }
+  | null;
+
+const getSortValue = (row: InventoryAuxiliarModalRow, key: AuxiliarSortKey): number | string => {
+  switch (key) {
+    case "fecha":
+      return row.date ? new Date(row.date).getTime() : 0;
+    case "documento":
+      return row.document;
+    case "tm":
+      return row.tm;
+    case "costo":
+      return row.cost;
+    case "entradas":
+      return row.entries ?? 0;
+    case "salidas":
+      return row.exits ?? 0;
+    case "stock":
+      return row.stock;
+    case "alm":
+      return row.warehouse;
+    case "pzas":
+      return row.pieces ?? 0;
+    case "ruta":
+      return row.route;
+    case "usr":
+      return row.user ?? 0;
+    case "reval":
+      return row.revaluation;
+    case "referencia":
+      return row.reference;
+    default:
+      return "";
+  }
+};
+
+const compareValues = (a: number | string, b: number | string): number => {
+  if (typeof a === "number" && typeof b === "number") {
+    return a - b;
+  }
+
+  return String(a).localeCompare(String(b), "es", { numeric: true, sensitivity: "base" });
+};
+
 function InventoryAuxiliarModal() {
   const {
     isOpen,
@@ -34,13 +89,41 @@ function InventoryAuxiliarModal() {
     selectRow,
     filterBySelectedWarehouse,
   } = useInventoryAuxiliarModal();
+  const [sortState, setSortState] = useState<AuxiliarSortState>(null);
+
+  const sortedRows = useMemo(() => {
+    if (!sortState) {
+      return rows;
+    }
+
+    const clonedRows = [...rows];
+    clonedRows.sort((leftRow, rightRow) => {
+      const leftValue = getSortValue(leftRow, sortState.key);
+      const rightValue = getSortValue(rightRow, sortState.key);
+      const comparison = compareValues(leftValue, rightValue);
+      return sortState.direction === "asc" ? comparison : -comparison;
+    });
+
+    return clonedRows;
+  }, [rows, sortState]);
+
+  const handleSort = (key: AuxiliarSortKey): void => {
+    setSortState((currentSortState) => {
+      if (!currentSortState || currentSortState.key !== key) {
+        return { key, direction: "asc" };
+      }
+
+      const nextDirection: AuxiliarSortDirection = currentSortState.direction === "asc" ? "desc" : "asc";
+      return { key, direction: nextDirection };
+    });
+  };
 
   if (!isOpen) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_AUXILIAR} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(980px,92vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -74,32 +157,34 @@ function InventoryAuxiliarModal() {
           </div>
         </div>
 
-        <div className="modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
+        <div className="relative modal-scroll min-h-0 flex-1 overflow-auto border-b border-[#9ca3ab]">
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
                 {COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
-                    {column.label}
+                    <span>{column.label}</span>
+                    {sortState?.key === column.key ? <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span> : null}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {sortedRows.map((row) => (
                 <tr
-                  key={`${row.date}-${row.document}-${row.warehouse}-${row.user}`}
+                  key={row.rowId}
                   className={`cursor-default ${
-                    selectedRowKey === `${row.date}-${row.document}-${row.warehouse}-${row.user}`
+                    selectedRowKey === row.rowId
                       ? "bg-[#cfe5ff]"
                       : "bg-[#efefef] odd:bg-[#f4f4f4]"
                   }`}
                   onClick={() =>
                     selectRow(
-                      `${row.date}-${row.document}-${row.warehouse}-${row.user}`,
+                      row.rowId,
                       row.warehouse,
                     )
                   }
@@ -121,11 +206,7 @@ function InventoryAuxiliarModal() {
               ))}
             </tbody>
           </table>
-          {isLoading ? (
-            <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#f6f6f6] px-2 py-1 text-[11px] text-[#334155]">
-              Cargando auxiliar...
-            </div>
-          ) : null}
+          {isLoading ? <LegacyModalLoader label="Cargando auxiliar..." /> : null}
           {error ? (
             <div className="sticky bottom-0 border-t border-[#a6adb5] bg-[#ffe7e7] px-2 py-1 text-[11px] text-[#8b1e1e]">
               {error}
@@ -153,7 +234,7 @@ function InventoryAuxiliarModal() {
           </button>
         </footer>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

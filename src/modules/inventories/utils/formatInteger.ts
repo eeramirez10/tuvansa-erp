@@ -1,9 +1,13 @@
 
-
 export const formatInteger = (value: number | null | undefined): string => {
+  const formatter = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  });
+
   if (value === null || value === undefined || Number.isNaN(value)) {
-    return "0";
+    return formatter.format(0);
   }
 
-  return String(Math.trunc(value));
+  return formatter.format(Math.trunc(value));
 };

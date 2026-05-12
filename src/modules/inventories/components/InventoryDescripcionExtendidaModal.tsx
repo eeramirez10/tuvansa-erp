@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { useModal } from "../../ui/hooks/useModal";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 import { useInventoriesStore } from "../store/inventories.store";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 
 type DescriptionBlock = {
   key: string;
@@ -46,7 +47,7 @@ function InventoryDescripcionExtendidaModal() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_DESCR_EXT} isOpen={isOpen}>
       <section className="grid h-[min(620px,90vh)] w-[min(760px,96vw)] grid-cols-[1fr_84px] border border-[#2f8ce8] bg-[#ececec]">
         <div className="flex min-h-0 flex-col border-r border-[#b1b8bf]">
           <header className="flex h-[30px] items-center justify-between border-b border-[#99a4af] bg-[#f0f0f0] px-2">
@@ -117,7 +118,7 @@ function InventoryDescripcionExtendidaModal() {
           </button>
         </div>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

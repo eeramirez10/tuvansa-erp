@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useModal } from "../../ui/hooks/useModal";
 import { MODAL_IDS } from "../../ui/store/modal.store";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 
 const HEADERS = ["Llave", "Desc 1", "Desc 2", "Precio", "Fecha", "Vence", "Cant I.", "Cant F.", "Depto.", "Observaciones"];
 
@@ -12,7 +13,7 @@ function InventoryDescuentosProveedoresModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_DESCUENTOS_PROVEEDORES} isOpen={isOpen}>
       <section className="flex h-[min(390px,70vh)] w-[min(900px,96vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[24px] items-center justify-between border-b border-[#a9b0b8] bg-[#f0f0f0] px-2">
           <div className="flex items-center gap-1">
@@ -67,7 +68,7 @@ function InventoryDescuentosProveedoresModal() {
           </div>
         </div>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

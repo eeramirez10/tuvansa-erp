@@ -5,6 +5,8 @@ import { formatFixed } from "../utils/formatFixed";
 import { formatInteger } from "../utils/formatInteger";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { LegacyInput } from "../../shared/components/legacy-form/LegacyInput";
+import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
+import { MODAL_IDS } from "../../ui/store/modal.store";
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -52,7 +54,7 @@ function InventoryOthersModal() {
   const vars = others?.vars.values ?? [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 p-4">
+    <ManagedWindowLayer windowId={MODAL_IDS.INVENTORY_OTHERS} isOpen={isOpen}>
       <section className="flex h-[min(560px,78vh)] w-[min(1400px,99vw)] flex-col border border-[#2f8ce8] bg-[#ececec]">
         <header className="flex h-[22px] items-center justify-between border-b border-[#a9b1b9] bg-[#f1f1f1] px-1">
           <div className="flex items-center gap-1">
@@ -572,7 +574,7 @@ function InventoryOthersModal() {
           </div>
         </div>
       </section>
-    </div>
+    </ManagedWindowLayer>
   );
 }
 

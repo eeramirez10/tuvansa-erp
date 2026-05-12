@@ -3,6 +3,7 @@ import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { useInventoryVentasDesglosadasModal } from "../hooks/useInventoryVentasDesglosadasModal";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -20,6 +21,12 @@ const COLUMNS = [
 
 function InventoryVentasDesglosadasModal() {
   const { isOpen, close, currentCode, rows, total, isLoading, error } = useInventoryVentasDesglosadasModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -60,15 +67,19 @@ function InventoryVentasDesglosadasModal() {
                 {COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, index) => (
+              {sortedRows.map((row, index) => (
                 <tr key={`${row.code}-${row.document}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[78px] border border-[#a6adb5] px-1 py-[5px]">{row.code}</td>
                   <td className="w-[330px] border border-[#a6adb5] px-1 py-[5px]">{row.name}</td>

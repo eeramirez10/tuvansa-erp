@@ -3,12 +3,38 @@ import { useInventoryUepsPepsModal } from "../hooks/useInventoryUepsPepsModal";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
+
+const COLUMNS = [
+  { key: "initial", label: "Inicial", width: "w-[84px]" },
+  { key: "quantity", label: "Cantidad", width: "w-[92px]" },
+  { key: "cost", label: "Costo", width: "w-[84px]" },
+  { key: "adValorem", label: "Adv.", width: "w-[74px]" },
+  { key: "date", label: "Fecha", width: "w-[92px]" },
+  { key: "document", label: "Doc.", width: "w-[96px]" },
+  { key: "lot", label: "Lote", width: "w-[96px]" },
+  { key: "expirationAt", label: "Caducidad", width: "w-[96px]" },
+  { key: "itemKey", label: "Llave", width: "w-[88px]" },
+  { key: "itemGroup", label: "\u00a0", width: "w-[62px]" },
+  { key: "warehouse", label: "Alm", width: "w-[44px]" },
+  { key: "provider", label: "Proveedor", width: "w-[84px]" },
+  { key: "exchangeRate", label: "T.C.", width: "w-[76px]" },
+  { key: "costDollars", label: "Costo Dlls", width: "w-[88px]" },
+  { key: "adValoremDollars", label: "Adv. Dlls", width: "w-[88px]" },
+  { key: "totalMxn", label: "\u00a0", width: "w-[96px]" },
+] as const;
 
 function InventoryUepsPepsModal() {
   const { isOpen, close, currentCode, rows, isLoading, error, totalQuantity, totalAverageCost } =
     useInventoryUepsPepsModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -44,26 +70,22 @@ function InventoryUepsPepsModal() {
           <table className="w-max min-w-full border-collapse bg-[#efefef] text-[11px] leading-none text-[#1d2836]">
             <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
               <tr>
-                <th className="w-[84px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Inicial</th>
-                <th className="w-[92px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Cantidad</th>
-                <th className="w-[84px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Costo</th>
-                <th className="w-[74px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Adv.</th>
-                <th className="w-[92px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Fecha</th>
-                <th className="w-[96px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Doc.</th>
-                <th className="w-[96px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Lote</th>
-                <th className="w-[96px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Caducidad</th>
-                <th className="w-[88px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Llave</th>
-                <th className="w-[62px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">&nbsp;</th>
-                <th className="w-[44px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Alm</th>
-                <th className="w-[84px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Proveedor</th>
-                <th className="w-[76px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">T.C.</th>
-                <th className="w-[88px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Costo Dlls</th>
-                <th className="w-[88px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Adv. Dlls</th>
-                <th className="w-[96px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">&nbsp;</th>
+                {COLUMNS.map((column) => (
+                  <th
+                    key={column.key}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
+                  >
+                    {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {sortedRows.map((row) => (
                 <tr key={row.key} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="border border-[#a6adb5] px-1 py-[5px] text-right">{formatFixed(row.initial, 4)}</td>
                   <td className="border border-[#a6adb5] px-1 py-[5px] text-right">{formatFixed(row.quantity, 4)}</td>

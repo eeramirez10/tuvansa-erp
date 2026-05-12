@@ -4,6 +4,7 @@ import { useInventoryCotizacionesClienteData } from "../hooks/useInventoryPedido
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -21,6 +22,35 @@ const COTIZACIONES_COLUMNS = [
 
 function InventoryCotizacionesClienteModal() {
   const { isOpen, close, currentCode, rows, isLoading, error } = useInventoryCotizacionesClienteData();
+  type SortKey = (typeof COTIZACIONES_COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => {
+      switch (key) {
+        case "expectedDate":
+          return row.expectedDate ?? "";
+        case "number":
+          return row.number;
+        case "ordered":
+          return row.ordered;
+        case "supplied":
+          return row.supplied;
+        case "remaining":
+          return row.remaining;
+        case "assigned":
+          return row.assigned;
+        case "externalNumber":
+          return row.externalNumber;
+        case "code":
+          return row.code;
+        case "description":
+          return row.description;
+        default:
+          return "";
+      }
+    },
+  );
 
   const summary = useMemo(() => {
     const assigned = rows.reduce((acc, row) => acc + row.assigned, 0);
@@ -76,15 +106,19 @@ function InventoryCotizacionesClienteModal() {
                 {COTIZACIONES_COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, index) => (
+              {sortedRows.map((row, index) => (
                 <tr key={`${row.code}-${row.number}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[88px] border border-[#a6adb5] px-1 py-[5px]">{row.code}</td>
                   <td className="w-[300px] border border-[#a6adb5] px-1 py-[5px]">{row.description}</td>

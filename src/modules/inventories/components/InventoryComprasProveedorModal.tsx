@@ -2,6 +2,7 @@ import { Square, X } from "lucide-react";
 import { formatFixed } from "../utils/formatFixed";
 import { useInventoryComprasProveedorModal } from "../hooks/useInventoryComprasProveedorModal";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -14,6 +15,12 @@ const COLUMNS = [
 
 function InventoryComprasProveedorModal() {
   const { isOpen, close, currentCode, rows, summary, isLoading, error } = useInventoryComprasProveedorModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -52,9 +59,13 @@ function InventoryComprasProveedorModal() {
                 {COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
@@ -80,7 +91,7 @@ function InventoryComprasProveedorModal() {
                   </td>
                 </tr>
               ) : null}
-              {rows.map((row) => (
+              {sortedRows.map((row) => (
                 <tr key={`${row.code}-${row.supplier}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[82px] border border-[#a6adb5] px-1 py-[4px]">{row.code}</td>
                   <td className="w-[350px] border border-[#a6adb5] px-1 py-[4px]">{row.supplier}</td>

@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useInventoryWarehousesModal } from "../hooks/useInventoryWarehousesModal";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -103,6 +104,12 @@ const formatLegacyDate = (value: string | null): string => {
 
 function InventoryWarehousesModal() {
   const { isOpen, close, rows, totalRow, isLoading, error, currentCode } = useInventoryWarehousesModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -133,9 +140,13 @@ function InventoryWarehousesModal() {
                 {COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
@@ -158,7 +169,7 @@ function InventoryWarehousesModal() {
                 ))}
               </tr>
 
-              {rows.map((row) => (
+              {sortedRows.map((row) => (
                 <tr key={`${row.alm}-${row.description}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   {COLUMNS.map((column) => {
                     const value = row[column.key];

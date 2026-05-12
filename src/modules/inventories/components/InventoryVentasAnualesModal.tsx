@@ -2,6 +2,7 @@ import { Square, X } from "lucide-react";
 import { formatInteger } from "../utils/formatInteger";
 import { useInventoryVentasAnualesModal } from "../hooks/useInventoryVentasAnualesModal";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -36,6 +37,18 @@ const renderMonthValue = (value: number): string => {
 
 function InventoryVentasAnualesModal() {
   const { isOpen, close, currentCode, rows, totals, fromDate, getRowTotal, isLoading, error } = useInventoryVentasAnualesModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => {
+      if (key === "total") {
+        return getRowTotal(row);
+      }
+
+      return row[key];
+    },
+  );
 
   if (!isOpen) {
     return null;
@@ -74,9 +87,13 @@ function InventoryVentasAnualesModal() {
                 {COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
@@ -93,7 +110,7 @@ function InventoryVentasAnualesModal() {
                 ))}
                 <td className="w-[60px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatInteger(totals.total)}</td>
               </tr>
-              {rows.map((row, index) => (
+              {sortedRows.map((row, index) => (
                 <tr key={`${row.code}-${row.year}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[82px] border border-[#a6adb5] px-1 py-[4px] text-[#0f4578]">{row.code}</td>
                   <td className="w-[300px] border border-[#a6adb5] px-1 py-[4px]">{row.name}</td>

@@ -3,8 +3,31 @@ import { useInventoryLotesModal } from "../hooks/useInventoryLotesModal";
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
+
+const LOTE_COLUMNS = [
+  { key: "date", label: "Fecha", width: "w-[92px]" },
+  { key: "expirationAt", label: "Caducidad", width: "w-[92px]" },
+  { key: "pedimento", label: "Pedimento", width: "w-[150px]" },
+  { key: "customs", label: "Aduana", width: "w-[64px]" },
+  { key: "lot", label: "Lote", width: "w-[72px]" },
+  { key: "available", label: "Disponible", width: "w-[86px]" },
+  { key: "warehouse", label: "Alm", width: "w-[42px]" },
+  { key: "location", label: "Localización", width: "w-[96px]" },
+  { key: "sequence", label: "Secuencia", width: "w-[88px]" },
+  { key: "cost", label: "Costo", width: "w-[84px]" },
+  { key: "adValorem", label: "Advalorem", width: "w-[84px]" },
+] as const;
+
+const MOVEMENT_COLUMNS = [
+  { key: "date", label: "Fecha", width: "w-[76px]" },
+  { key: "document", label: "Doc.", width: "w-[102px]" },
+  { key: "entries", label: "Entradas", width: "w-[86px]" },
+  { key: "exits", label: "Salidas", width: "w-[86px]" },
+  { key: "warehouse", label: "Alm", width: "w-[44px]" },
+] as const;
 
 function InventoryLotesModal() {
   const {
@@ -12,7 +35,6 @@ function InventoryLotesModal() {
     close,
     currentCode,
     rows,
-    selectedRow,
     selectedRowKey,
     setSelectedRowKey,
     isLoading,
@@ -20,6 +42,23 @@ function InventoryLotesModal() {
     totalAvailable,
     selectedMovementBalance,
   } = useInventoryLotesModal();
+  type LoteSortKey = (typeof LOTE_COLUMNS)[number]["key"];
+  type MovementSortKey = (typeof MOVEMENT_COLUMNS)[number]["key"];
+
+  const { sortState: lotesSortState, sortedRows: sortedLoteRows, handleSort: handleLotesSort } = useLegacyTableSort(
+    rows,
+    (row, key: LoteSortKey) => row[key],
+  );
+
+  const selectedSortedRow =
+    sortedLoteRows.find((row) => row.key === selectedRowKey) ??
+    sortedLoteRows[0] ??
+    null;
+
+  const { sortState: movementSortState, sortedRows: sortedMovements, handleSort: handleMovementSort } = useLegacyTableSort(
+    selectedSortedRow?.movements ?? [],
+    (row, key: MovementSortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -57,21 +96,22 @@ function InventoryLotesModal() {
               <table className="w-max min-w-full border-collapse text-[11px] leading-none text-[#1d2836]">
                 <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
                   <tr>
-                    <th className="w-[92px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Fecha</th>
-                    <th className="w-[92px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Caducidad</th>
-                    <th className="w-[150px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Pedimento</th>
-                    <th className="w-[64px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Aduana</th>
-                    <th className="w-[72px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Lote</th>
-                    <th className="w-[86px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Disponible</th>
-                    <th className="w-[42px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Alm</th>
-                    <th className="w-[96px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Localización</th>
-                    <th className="w-[88px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Secuencia</th>
-                    <th className="w-[84px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Costo</th>
-                    <th className="w-[84px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Advalorem</th>
+                    {LOTE_COLUMNS.map((column) => (
+                      <th
+                        key={column.key}
+                        onClick={() => handleLotesSort(column.key)}
+                        className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
+                      >
+                        {column.label}
+                        {lotesSortState?.key === column.key ? (
+                          <span className="ml-1">{lotesSortState.direction === "asc" ? "▲" : "▼"}</span>
+                        ) : null}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((row) => (
+                  {sortedLoteRows.map((row) => (
                     <tr
                       key={row.key}
                       onClick={() => setSelectedRowKey(row.key)}
@@ -110,15 +150,22 @@ function InventoryLotesModal() {
               <table className="w-full border-collapse text-[11px] leading-none text-[#1d2836]">
                 <thead className="sticky top-0 z-10 bg-[#dcdcdc]">
                   <tr>
-                    <th className="w-[76px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Fecha</th>
-                    <th className="w-[102px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Doc.</th>
-                    <th className="w-[86px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Entradas</th>
-                    <th className="w-[86px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Salidas</th>
-                    <th className="w-[44px] border border-[#a6adb5] px-1 py-[5px] text-left font-normal">Alm</th>
+                    {MOVEMENT_COLUMNS.map((column) => (
+                      <th
+                        key={column.key}
+                        onClick={() => handleMovementSort(column.key)}
+                        className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
+                      >
+                        {column.label}
+                        {movementSortState?.key === column.key ? (
+                          <span className="ml-1">{movementSortState.direction === "asc" ? "▲" : "▼"}</span>
+                        ) : null}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {(selectedRow?.movements ?? []).map((row, index) => (
+                  {sortedMovements.map((row, index) => (
                     <tr key={`${row.document}-${row.date ?? ""}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                       <td className="border border-[#a6adb5] px-1 py-[5px]">{formatLegacyDate(row.date)}</td>
                       <td className="border border-[#a6adb5] px-1 py-[5px] text-[#144d84]">{row.document}</td>

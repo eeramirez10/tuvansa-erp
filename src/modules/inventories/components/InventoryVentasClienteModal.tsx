@@ -2,6 +2,7 @@ import { Square, X } from "lucide-react";
 import { useInventoryVentasClienteModal } from "../hooks/useInventoryVentasClienteModal";
 import { formatFixed } from "../utils/formatFixed";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -14,6 +15,12 @@ const SALES_COLUMNS = [
 
 function InventoryVentasClienteModal() {
   const { isOpen, close, currentCode, rows, isLoading, error, summary } = useInventoryVentasClienteModal();
+  type SortKey = (typeof SALES_COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   if (!isOpen) {
     return null;
@@ -52,15 +59,19 @@ function InventoryVentasClienteModal() {
                 {SALES_COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {sortedRows.map((row) => (
                 <tr key={`${row.code}-${row.client}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[90px] border border-[#a6adb5] px-1 py-[5px]">{row.code}</td>
                   <td className="w-[360px] border border-[#a6adb5] px-1 py-[5px]">{row.client}</td>

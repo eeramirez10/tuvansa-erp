@@ -3,6 +3,7 @@ import { useInventoryPedidosClienteData } from "../hooks/useInventoryPedidosModa
 import { formatFixed } from "../utils/formatFixed";
 import { formatLegacyDate } from "../utils/formatLegacyDate";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -24,6 +25,43 @@ const CLIENTE_COLUMNS = [
 
 function InventoryPedidosClienteModal() {
   const { isOpen, close, currentCode, rows, isLoading, error, summary } = useInventoryPedidosClienteData();
+  type SortKey = (typeof CLIENTE_COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => {
+      switch (key) {
+        case "dueDate":
+          return row.expectedDate ?? "";
+        case "num":
+          return row.number;
+        case "ordered":
+          return row.ordered;
+        case "supplied":
+          return row.supplied;
+        case "remaining":
+          return row.remaining;
+        case "assigned":
+          return row.assigned;
+        case "price":
+          return row.price;
+        case "externalNum":
+          return row.externalNumber;
+        case "pieces":
+          return row.pieces;
+        case "warehouse":
+          return row.warehouse;
+        case "wms":
+          return row.wms;
+        case "code":
+          return row.code;
+        case "description":
+          return row.description;
+        default:
+          return "";
+      }
+    },
+  );
 
   if (!isOpen) {
     return null;
@@ -62,15 +100,19 @@ function InventoryPedidosClienteModal() {
                 {CLIENTE_COLUMNS.map((column) => (
                   <th
                     key={column.key}
-                    className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                    onClick={() => handleSort(column.key)}
+                    className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                   >
                     {column.label}
+                    {sortState?.key === column.key ? (
+                      <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                    ) : null}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row, index) => (
+              {sortedRows.map((row, index) => (
                 <tr key={`${row.code}-${row.number}-${index}`} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                   <td className="w-[72px] border border-[#a6adb5] px-1 py-[5px]">{row.code}</td>
                   <td className="w-[290px] border border-[#a6adb5] px-1 py-[5px]">{row.description}</td>

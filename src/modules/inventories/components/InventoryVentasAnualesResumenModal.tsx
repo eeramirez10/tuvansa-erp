@@ -2,6 +2,7 @@ import { Square, X } from "lucide-react";
 import { formatInteger } from "../utils/formatInteger";
 import { useInventoryVentasAnualesResumenModal } from "../hooks/useInventoryVentasAnualesResumenModal";
 import { LegacyModalLoader } from "../../shared/components/legacy-form/LegacyModalLoader";
+import { useLegacyTableSort } from "../../shared/hooks/useLegacyTableSort";
 import { ManagedWindowLayer } from "../../ui/components/ManagedWindowLayer";
 import { MODAL_IDS } from "../../ui/store/modal.store";
 
@@ -51,6 +52,12 @@ const buildPolylinePoints = (values: number[], minValue: number, maxValue: numbe
 
 function InventoryVentasAnualesResumenModal() {
   const { isOpen, close, currentCode, rows, totals, fromDate, isLoading, error } = useInventoryVentasAnualesResumenModal();
+  type SortKey = (typeof COLUMNS)[number]["key"];
+
+  const { sortState, sortedRows, handleSort } = useLegacyTableSort(
+    rows,
+    (row, key: SortKey) => row[key],
+  );
 
   const chartValues = rows.map((row) => monthKeys.map((key) => row[key]));
   const flatValues = chartValues.flat();
@@ -106,9 +113,13 @@ function InventoryVentasAnualesResumenModal() {
                   {COLUMNS.map((column) => (
                     <th
                       key={column.key}
-                      className={`${column.width} border border-[#a6adb5] px-1 py-[5px] text-left font-normal`}
+                      onClick={() => handleSort(column.key)}
+                      className={`${column.width} cursor-pointer border border-[#a6adb5] px-1 py-[5px] text-left font-normal hover:bg-[#d6dee7]`}
                     >
                       {column.label}
+                      {sortState?.key === column.key ? (
+                        <span className="ml-1">{sortState.direction === "asc" ? "▲" : "▼"}</span>
+                      ) : null}
                     </th>
                   ))}
                 </tr>
@@ -123,7 +134,7 @@ function InventoryVentasAnualesResumenModal() {
                   ))}
                   <td className="w-[54px] border border-[#a6adb5] px-1 py-[4px] text-right">{formatInteger(totals.total)}</td>
                 </tr>
-                {rows.map((row) => (
+                {sortedRows.map((row) => (
                   <tr key={row.year} className="bg-[#efefef] odd:bg-[#f4f4f4]">
                     <td className="w-[46px] border border-[#a6adb5] px-1 py-[4px]">{row.year}</td>
                     {monthKeys.map((key) => (
@@ -196,7 +207,7 @@ function InventoryVentasAnualesResumenModal() {
                 );
               })}
 
-              {rows.map((row, idx) => {
+              {sortedRows.map((row, idx) => {
                 const values = monthKeys.map((key) => row[key]);
                 const points = buildPolylinePoints(values, minValue, maxValue);
                 return <polyline key={row.year} fill="none" stroke={colors[idx % colors.length]} strokeWidth="1.4" points={points} />;
@@ -205,7 +216,7 @@ function InventoryVentasAnualesResumenModal() {
           </div>
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 text-[11px]">
-            {rows.map((row, idx) => (
+            {sortedRows.map((row, idx) => (
               <div key={`legend-${row.year}`} className="flex items-center gap-1">
                 <span className="inline-block h-[10px] w-[10px] border border-black" style={{ backgroundColor: colors[idx % colors.length] }} />
                 <span>{row.year}</span>
